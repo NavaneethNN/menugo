@@ -164,14 +164,63 @@ export default function ItemForm({ visible, onClose, item }: ItemFormProps) {
               keyboardType="decimal-pad"
             />
 
-            <Text style={styles.label}>Image URL</Text>
-            <TextInput
-              style={styles.input}
-              value={imageUrl}
-              onChangeText={setImageUrl}
-              placeholder="https://..."
-              autoCapitalize="none"
-            />
+            <Text style={styles.label}>Image</Text>
+            {imageUrl ? (
+              <View style={styles.imagePreview}>
+                <Text style={styles.imageUrl} numberOfLines={1}>{imageUrl}</Text>
+                <TouchableOpacity onPress={() => setImageUrl('')}>
+                  <X size={18} color="#ef4444" />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.uploadButton}
+                onPress={() => {
+                  // Web file picker - creates hidden input
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = async (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (!file) return;
+
+                    // Get pre-signed URL
+                    const res = await fetch(`${API_URL}/api/admin/upload-url`, {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        filename: file.name,
+                        contentType: file.type,
+                      }),
+                    });
+                    if (!res.ok) {
+                      alert('Failed to get upload URL');
+                      return;
+                    }
+                    const { uploadUrl, publicUrl } = await res.json();
+
+                    // Upload to R2
+                    const uploadRes = await fetch(uploadUrl, {
+                      method: 'PUT',
+                      body: file,
+                      headers: { 'Content-Type': file.type },
+                    });
+                    if (!uploadRes.ok) {
+                      alert('Failed to upload image');
+                      return;
+                    }
+
+                    setImageUrl(publicUrl);
+                  };
+                  input.click();
+                }}
+              >
+                <Text style={styles.uploadButtonText}>Choose Image</Text>
+              </TouchableOpacity>
+            )}
 
             <Text style={styles.label}>Category *</Text>
             <View style={styles.options}>
@@ -307,6 +356,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  imagePreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  imageUrl: {
+    flex: 1,
+    fontSize: 14,
+    color: '#374151',
+    marginRight: 8,
+  },
+  uploadButton: {
+    backgroundColor: '#f3f4f6',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'dashed',
+  },
+  uploadButtonText: {
+    color: '#6b7280',
+    fontSize: 14,
+    fontWeight: '500',
   },
   error: {
     color: '#ef4444',
