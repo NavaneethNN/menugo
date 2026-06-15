@@ -1,0 +1,64 @@
+# AI Coding Rules - Restaurant Ordering System
+# Read this file before executing any prompt
+
+## 1. Code Search & Analysis
+- **USE GRAPHIFY OUT FOR SEARCHING FILES** - Always check `graphify-out/graph.json` and `.graphify_analysis.json` first when exploring the codebase
+- Prefer `code_search` tool for initial exploration when context is unclear
+- Use `grep_search` for targeted finds after initial exploration
+- Never guess file locations - verify with tools
+
+## 2. Code Quality Standards
+- Write production-ready, type-safe TypeScript code
+- Use strict typing - no `any` unless absolutely necessary
+- Follow existing patterns in the codebase (check similar files first)
+- Keep functions small and focused (single responsibility)
+- Use early returns to reduce nesting
+- Prefer explicit over implicit
+
+## 3. Comments & Documentation Policy
+- **NO EXPLANATORY COMMENTS** in code - code should be self-documenting via clear naming
+- **NO JSDoc** unless it's a public API surface
+- **NO INLINE COMMENTS** explaining "what" - only "why" if it's non-obvious business logic
+- Exception: Complex algorithmic logic needs brief "why" comment
+- Keep comments under 1% of code lines
+
+## 4. File Structure & Imports
+- Group imports: external libs → internal packages → relative imports
+- One blank line between import groups
+- Use absolute imports for cross-package references
+- No `index.ts` barrel exports for new modules
+
+## 5. Error Handling
+- All async operations must have try/catch
+- Use Zod for all external input validation
+- Never expose internal error details to client (500 responses = generic message)
+- Log errors with context for debugging
+
+## 6. Database & Prisma
+- Always scope queries to `restaurantId` (no cross-tenant leakage)
+- Use `include` eagerly to avoid N+1 queries
+- No raw SQL unless performance critical
+- Migration required for schema changes
+
+## 7. Real-time Events (Socket.io)
+- All DB state changes must emit corresponding socket events
+- Use `emitEvent()` helper from `lib/realtime.ts`
+- Fail silently on emit errors (don't break API responses)
+- Event names must match `shared-types` exactly
+
+## 8. Testing Verification
+- Before marking complete, verify with actual test commands
+- Use Playwright for E2E when available
+- Manual verification steps must be copy-pasteable
+
+## 9. Security
+- No credentials in committed files
+- All staff endpoints require JWT + role verification
+- PINs stored as bcrypt hashes only
+- Validate all IDs belong to the same restaurant
+
+## 10. Output Format
+- Show minimal code diffs - context only when needed
+- Use proper file citations with line numbers
+- Never output full files unless requested
+- End with concise summary of changes
