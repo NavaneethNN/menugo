@@ -62,3 +62,13 @@
 - Use proper file citations with line numbers
 - Never output full files unless requested
 - End with concise summary of changes
+
+## 11. Git Workflow (Phases)
+- **AFTER EACH SUB-PHASE (2.1, 2.2, etc.):** Auto-commit with descriptive message
+  - Format: `git add -A && git commit -m "phase X.Y: brief description"`
+  - Example: `git commit -m "phase 2.1: add categories CRUD endpoints"`
+- **AFTER EACH FULL PHASE (Phase 2, Phase 3, etc.):**
+  1. Push current branch: `git push origin main`
+  2. Create new branch for next phase: `git checkout -b phase-X`
+  3. Continue work on the new branch
+- Never mix work from different phases on the same branch
