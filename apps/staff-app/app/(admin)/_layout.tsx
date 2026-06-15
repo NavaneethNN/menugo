@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Utensils, Table, ChefHat, Users, Settings } from 'lucide-react-native';
+import { Utensils, Table, ChefHat, Users, Settings, ClipboardList } from 'lucide-react-native';
 
 export default function AdminLayout() {
   return (
@@ -43,6 +43,13 @@ export default function AdminLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="sessions/index"
+        options={{
+          title: 'Sessions',
+          tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />,
         }}
       />
     </Tabs>
