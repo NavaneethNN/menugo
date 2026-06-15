@@ -1,0 +1,168 @@
+{
+  "name": "Restaurant Platform",
+  "version": "1",
+  "description": "QR-Based Restaurant Ordering & Fulfillment System — V1 Monorepo",
+  "nodes": [
+    {
+      "id": "root",
+      "label": "/ (monorepo root)",
+      "type": "folder",
+      "description": "pnpm workspace root — package.json, turbo.json, tsconfig.base.json, .env.example"
+    },
+    {
+      "id": "packages",
+      "label": "/packages",
+      "type": "folder",
+      "parent": "root",
+      "description": "Shared packages consumed by all apps"
+    },
+    {
+      "id": "pkg-db",
+      "label": "@restaurant/db",
+      "type": "package",
+      "parent": "packages",
+      "description": "Prisma schema + PrismaClient singleton. Shared by api and realtime-server.",
+      "files": [
+        "prisma/schema.prisma",
+        "prisma/seed.ts",
+        "src/index.ts"
+      ]
+    },
+    {
+      "id": "pkg-types",
+      "label": "@restaurant/shared-types",
+      "type": "package",
+      "parent": "packages",
+      "description": "TypeScript-only package. Enums, model shapes, Socket.io event maps, REST API request/response types.",
+      "files": [
+        "src/enums.ts",
+        "src/models.ts",
+        "src/socket-events.ts",
+        "src/api.ts",
+        "src/index.ts"
+      ]
+    },
+    {
+      "id": "apps",
+      "label": "/apps",
+      "type": "folder",
+      "parent": "root",
+      "description": "Deployable applications"
+    },
+    {
+      "id": "app-api",
+      "label": "@restaurant/api",
+      "type": "app",
+      "parent": "apps",
+      "description": "Next.js 14 App Router — all REST API routes. Runs on port 3001. Deployed to Vercel.",
+      "tech": ["Next.js 14", "TypeScript", "Prisma", "Zod", "Jose JWT"],
+      "files": [
+        "src/app/api/sessions/route.ts — POST /api/sessions (QR scan → create TableSession)",
+        "src/app/api/sessions/[id]/close/route.ts — PATCH /api/sessions/:id/close",
+        "src/app/api/restaurants/[id]/menu/route.ts — GET /api/restaurants/:id/menu",
+        "src/app/api/orders/route.ts — POST /api/orders (place order)",
+        "src/app/api/orders/[id]/route.ts — GET /api/orders/:id",
+        "src/app/api/orders/[id]/served/route.ts — PATCH /api/orders/:id/served",
+        "src/app/api/order-items/[id]/status/route.ts — PATCH /api/order-items/:id/status",
+        "src/app/api/kitchen/orders/route.ts — GET /api/kitchen/orders",
+        "src/app/api/staff/login/route.ts — POST /api/staff/login",
+        "src/lib/auth.ts — JWT sign/verify helpers",
+        "src/lib/order-status.ts — computeOrderStatus() pure function"
+      ]
+    },
+    {
+      "id": "app-customer",
+      "label": "@restaurant/customer-pwa",
+      "type": "app",
+      "parent": "apps",
+      "description": "Next.js 14 PWA — mobile-first customer ordering app. Runs on port 3000. Deployed to Vercel.",
+      "tech": ["Next.js 14", "TypeScript", "Tailwind CSS", "TanStack Query", "Socket.io-client"],
+      "routes": [
+        "/scan/[token] — party-size selector after QR scan",
+        "/menu/[restaurantId] — menu browse + cart + place order",
+        "/track/[orderId] — live order tracking with WebSocket"
+      ]
+    },
+    {
+      "id": "app-staff",
+      "label": "@restaurant/staff-app",
+      "type": "app",
+      "parent": "apps",
+      "description": "Expo / React Native app for kitchen, waiter, cashier, admin. Single codebase → iOS / Android / Web.",
+      "tech": ["Expo 51", "React Native", "Expo Router", "TanStack Query", "Zustand", "Socket.io-client"],
+      "screens": [
+        "/login — PIN-based staff login",
+        "/ (index) — redirects to role screen based on JWT role",
+        "/(kitchen) — kitchen dashboard: accept / prepare / ready items",
+        "/(waiter) — waiter dashboard: new & ready orders, mark served",
+        "/(cashier) — active tables, settle & close sessions",
+        "/(admin) — menu/table/kitchen/staff/workflow CRUD"
+      ]
+    },
+    {
+      "id": "app-realtime",
+      "label": "@restaurant/realtime-server",
+      "type": "app",
+      "parent": "apps",
+      "description": "Standalone Socket.io server. Runs on port 4000. Deployed to Railway or Render (persistent process, not serverless).",
+      "tech": ["Node.js", "TypeScript", "Socket.io 4"],
+      "rooms": [
+        "session:<sessionId> — customer tracking updates",
+        "restaurant:<id>:kitchen:<id> — per-kitchen new-order alerts",
+        "restaurant:<id>:waiter — waiter notifications",
+        "restaurant:<id>:cashier — seat availability updates"
+      ]
+    }
+  ],
+  "edges": [
+    { "from": "app-api",      "to": "pkg-db",    "label": "imports prisma client" },
+    { "from": "app-api",      "to": "pkg-types",  "label": "imports types" },
+    { "from": "app-realtime", "to": "pkg-types",  "label": "imports Socket event types" },
+    { "from": "app-customer", "to": "pkg-types",  "label": "imports API + event types" },
+    { "from": "app-staff",    "to": "pkg-types",  "label": "imports API + event types" },
+    { "from": "app-customer", "to": "app-api",    "label": "REST calls (fetch)" },
+    { "from": "app-staff",    "to": "app-api",    "label": "REST calls (fetch)" },
+    { "from": "app-customer", "to": "app-realtime", "label": "WebSocket (socket.io-client)" },
+    { "from": "app-staff",    "to": "app-realtime", "label": "WebSocket (socket.io-client)" },
+    { "from": "app-api",      "to": "app-realtime", "label": "emit events after DB writes" }
+  ],
+  "dataFlows": [
+    {
+      "id": "flow-order-managed",
+      "label": "Managed Dining order flow",
+      "steps": [
+        "Customer scans QR → POST /api/sessions",
+        "Customer browses menu → GET /api/restaurants/:id/menu",
+        "Customer places order → POST /api/orders",
+        "API emits order:new to kitchen room via Socket.io",
+        "Kitchen accepts/prepares/marks ready → PATCH /api/order-items/:id/status",
+        "API recomputes Order.status → emits order:partially_ready or order:fully_ready to waiter room",
+        "Waiter marks served → PATCH /api/orders/:id/served",
+        "API emits order:completed to customer session room",
+        "Cashier closes session → PATCH /api/sessions/:id/close"
+      ]
+    },
+    {
+      "id": "flow-order-self",
+      "label": "Self Collection order flow",
+      "steps": [
+        "Same as Managed Dining up to kitchen marking ready",
+        "API emits order:item_ready_for_pickup directly to customer session room",
+        "Customer sees pickup banner with kitchen name",
+        "Customer collects → kitchen/staff marks SERVED",
+        "Cashier closes session"
+      ]
+    },
+    {
+      "id": "flow-order-assisted",
+      "label": "Assisted Dining order flow",
+      "steps": [
+        "Customer places order → POST /api/orders",
+        "API emits order:new_full to waiter room",
+        "Waiter relays to kitchen verbally",
+        "Waiter marks order served → PATCH /api/orders/:id/served",
+        "Cashier closes session"
+      ]
+    }
+  ]
+}

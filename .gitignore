@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+.expo/
+*.tsbuildinfo
+
+# Environment files
+# .env
+# .env.local
+# .env.*.local
+# .env.production
+
+# Prisma
+packages/db/prisma/migrations/
+
+# Turbo
+.turbo/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+
+# Expo
+.expo-shared/
+web-build/

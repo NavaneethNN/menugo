@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- ENUMS ----------
+
+enum WorkflowMode {
+  ASSISTED_DINING
+  MANAGED_DINING
+  SELF_COLLECTION
+}
+
+enum StaffRole {
+  ADMIN
+  KITCHEN
+  WAITER
+  CASHIER
+}
+
+enum SessionStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum OrderItemStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  READY
+  SERVED
+}
+
+enum OrderStatus {
+  PLACED
+  PARTIALLY_READY
+  FULLY_READY
+  COMPLETED
+}
+
+// ---------- CORE MODELS ----------
+
+model Restaurant {
+  id           String       @id @default(cuid())
+  name         String
+  workflowMode WorkflowMode @default(MANAGED_DINING)
+  createdAt    DateTime     @default(now())
+
+  tables     Table[]
+  categories Category[]
+  kitchens   Kitchen[]
+  menuItems  MenuItem[]
+  staff      Staff[]
+}
+
+model Table {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  tableNumber  String
+  totalSeats   Int
+  qrToken      String     @unique // encoded in QR code
+
+  sessions TableSession[]
+
+  @@unique([restaurantId, tableNumber])
+}
+
+model TableSession {
+  id            String        @id @default(cuid())
+  tableId       String
+  table         Table         @relation(fields: [tableId], references: [id])
+  seatsOccupied Int
+  status        SessionStatus @default(ACTIVE)
+  startedAt     DateTime      @default(now())
+  closedAt      DateTime?
+  closedBy      String? // "cashier" | "auto_expiry" | "customer"
+
+  orders Order[]
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  name         String
+  sortOrder    Int        @default(0)
+
+  menuItems MenuItem[]
+}
+
+model Kitchen {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  name         String // e.g. "K1", "Beverage Counter"
+
+  menuItems  MenuItem[]
+  orderItems OrderItem[]
+  staff      Staff[]
+}
+
+model MenuItem {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id])
+  kitchenId    String
+  kitchen      Kitchen    @relation(fields: [kitchenId], references: [id])
+
+  name                String
+  description         String?
+  price               Decimal
+  imageUrl            String?
+  isAvailable         Boolean @default(true)
+
+  orderItems OrderItem[]
+}
+
+model Staff {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  name         String
+  role         StaffRole
+  pin          String // simple PIN login for V1
+  kitchenId    String? // only set if role = KITCHEN
+  kitchen      Kitchen?   @relation(fields: [kitchenId], references: [id])
+  isActive     Boolean    @default(true)
+}
+
+model Order {
+  id             String       @id @default(cuid())
+  tableSessionId String
+  tableSession   TableSession @relation(fields: [tableSessionId], references: [id])
+  status         OrderStatus  @default(PLACED)
+  createdAt      DateTime     @default(now())
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id         String @id @default(cuid())
+  orderId    String
+  order      Order  @relation(fields: [orderId], references: [id])
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  kitchenId  String
+  kitchen    Kitchen @relation(fields: [kitchenId], references: [id])
+
+  quantity            Int
+  specialInstructions String?
+  status              OrderItemStatus @default(PENDING)
+  readyAt             DateTime?
+  servedAt            DateTime?
+}
