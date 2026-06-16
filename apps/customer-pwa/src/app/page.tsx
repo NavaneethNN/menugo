@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function HomePage() {
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const error = searchParams.get('error');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const sessionId = sessionStorage.getItem('sessionId');
@@ -15,6 +15,12 @@ export default function HomePage() {
       router.replace(`/menu/${restaurantId}`);
     }
   }, [router]);
+
+  useEffect(() => {
+    if (searchParams) {
+      setError(searchParams.get('error'));
+    }
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-brand-50 to-white">
@@ -33,5 +39,17 @@ export default function HomePage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-brand-50 to-white">
+        <div className="animate-spin w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full" />
+      </main>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
