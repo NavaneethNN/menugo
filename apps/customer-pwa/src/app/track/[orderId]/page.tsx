@@ -29,7 +29,7 @@ const STATUS_ICONS: Record<OrderItemStatus, React.ReactNode> = {
 
 const STATUS_COLOR: Record<OrderItemStatus, string> = {
   PENDING: 'bg-gray-100 text-gray-500',
-  ACCEPTED: 'bg-yellow-100 text-yellow-600',
+  ACCEPTED: 'bg-blue-100 text-blue-600',
   PREPARING: 'bg-orange-100 text-orange-600',
   READY: 'bg-green-100 text-green-700',
   SERVED: 'bg-brand-100 text-brand-700',
@@ -80,7 +80,7 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
     };
   }, [params.orderId, queryClient]);
 
-  const workflowMode = sessionStorage.getItem('workflowMode') ?? 'MANAGED_DINING';
+  const workflowMode = order.workflowMode;
 
   if (isLoading || !order) {
     return (
@@ -111,12 +111,18 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
             </div>
           </div>
         )}
-        {!allServed && allReady && workflowMode === 'SELF_COLLECTION' && (
+        {!allServed && anyReady && workflowMode === 'SELF_COLLECTION' && (
           <div className="rounded-2xl bg-brand-50 border border-brand-200 p-4 flex items-center gap-3 animate-pulse">
             <PackageCheck className="w-6 h-6 text-brand-600 shrink-0" />
             <div>
-              <p className="font-bold text-brand-800">Your order is ready for pickup!</p>
-              <p className="text-sm text-brand-600">Please collect from the counter.</p>
+              <p className="font-bold text-brand-800">Ready for Pickup</p>
+              <p className="text-sm text-brand-600">
+                {order.items
+                  .filter((i) => i.status === 'READY')
+                  .map((i) => i.kitchenName)
+                  .filter((v, i, a) => a.indexOf(v) === i)
+                  .join(', ')}
+              </p>
             </div>
           </div>
         )}
@@ -143,9 +149,7 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
               className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm border border-gray-100"
             >
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900">
-                  {(item as any).menuItem?.name ?? 'Item'}
-                </p>
+                <p className="font-medium text-gray-900">{item.menuItemName}</p>
                 <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity}</p>
                 {item.specialInstructions && (
                   <p className="text-xs text-gray-400 mt-0.5 italic">

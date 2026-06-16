@@ -63,6 +63,8 @@ export interface Order {
   id: string;
   tableSessionId: string;
   status: OrderStatus;
+  workflowMode: WorkflowMode;
+  tableNumber: string;
   createdAt: string;
   items: OrderItem[];
 }
@@ -71,7 +73,9 @@ export interface OrderItem {
   id: string;
   orderId: string;
   menuItemId: string;
+  menuItemName: string;
   kitchenId: string;
+  kitchenName: string;
   quantity: number;
   specialInstructions: string | null;
   status: OrderItemStatus;
