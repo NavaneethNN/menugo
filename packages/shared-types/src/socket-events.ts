@@ -94,6 +94,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   'order_item:status_update': (data: OrderItemStatusUpdateEvent) => void;
   join_room: (roomId: string) => void;
+  join_rooms: (roomIds: string[]) => void;
 }
 
 export interface InterServerEvents {}
