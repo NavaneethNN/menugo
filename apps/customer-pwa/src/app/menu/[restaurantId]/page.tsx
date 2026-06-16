@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ShoppingCart, Minus, Plus, ChevronRight, Loader2 } from 'lucide-react';
-import type { MenuResponse } from '@restaurant/shared-types';
+import type { MenuResponse, MenuItem } from '@restaurant/shared-types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -20,6 +20,13 @@ export default function MenuPage({ params }: { params: { restaurantId: string } 
   const router = useRouter();
   const [cart, setCart] = useState<Record<string, CartItem>>({});
   const [showCart, setShowCart] = useState(false);
+
+  useEffect(() => {
+    const sessionId = sessionStorage.getItem('sessionId');
+    if (!sessionId) {
+      router.replace('/?error=session_expired');
+    }
+  }, [router]);
 
   const { data, isLoading } = useQuery<MenuResponse>({
     queryKey: ['menu', params.restaurantId],

@@ -33,7 +33,7 @@ export async function verifyStaffToken(token: string): Promise<StaffTokenPayload
 export async function signSessionToken(payload: SessionTokenPayload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('12h')
+    .setExpirationTime('8h')
     .sign(JWT_SECRET);
 }
 

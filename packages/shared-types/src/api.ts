@@ -18,9 +18,12 @@ export interface CreateSessionResponse {
 
 // GET /api/restaurants/:id/menu
 export interface MenuResponse {
+  restaurantId: string;
+  restaurantName: string;
+  workflowMode: WorkflowMode;
   categories: Array<
     Category & {
-      items: MenuItem[];
+      menuItems: MenuItem[];
     }
   >;
 }
