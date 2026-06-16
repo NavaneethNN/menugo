@@ -36,7 +36,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             } 
           } 
         } 
-      } 
+      },
+      menuItem: true,
     },
   });
 
@@ -76,7 +77,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
           'order:partially_ready',
           {
             orderId: item.orderId,
-            tableNumber: item.order.tableSession.table.number,
+            tableNumber: item.order.tableSession.table.tableNumber,
             readyItems: readyItems.map(i => ({
               orderItemId: i.id,
               name: i.menuItem.name,
@@ -97,7 +98,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
           'order:fully_ready',
           {
             orderId: item.orderId,
-            tableNumber: item.order.tableSession.table.number,
+            tableNumber: item.order.tableSession.table.tableNumber,
             items: item.order.items.map(i => ({
               orderItemId: i.id,
               name: i.menuItem.name,
@@ -126,7 +127,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
           'order:fully_ready',
           {
             orderId: item.orderId,
-            tableNumber: item.order.tableSession.table.number,
+            tableNumber: item.order.tableSession.table.tableNumber,
             items: item.order.items.map(i => ({
               orderItemId: i.id,
               name: i.menuItem.name,

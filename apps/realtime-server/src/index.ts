@@ -92,7 +92,9 @@ io.use(async (socket, next) => {
       socket.data.staffId = payload.staffId;
       socket.data.restaurantId = payload.restaurantId;
       socket.data.role = payload.role;
-      socket.data.kitchenId = payload.kitchenId;
+      if (payload.kitchenId) {
+        socket.data.kitchenId = payload.kitchenId;
+      }
     } else {
       socket.data.role = 'CUSTOMER';
     }

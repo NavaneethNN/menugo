@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
       'order:new_full',
       {
         orderId: order.id,
-        tableNumber: session.table.number,
+        tableNumber: session.table.tableNumber,
         items: order.items.map(item => ({
           orderItemId: item.id,
           name: item.menuItem.name,
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
         'order:new',
         {
           orderId: order.id,
-          tableNumber: session.table.number,
+          tableNumber: session.table.tableNumber,
           items: kitchenItems.map(item => ({
             orderItemId: item.id,
             name: item.menuItem.name,
