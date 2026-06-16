@@ -76,12 +76,13 @@ export async function POST(req: NextRequest) {
     data: {
       tableSessionId: sessionId,
       status: 'PLACED',
+      workflowMode: session.table.restaurant.workflowMode,
       items: {
         create: items.map((item) => {
           const mi = menuItemMap.get(item.menuItemId)!;
           return {
             menuItemId: item.menuItemId,
-            kitchenId: mi.kitchenId, // denormalized copy
+            kitchenId: mi.kitchenId,
             quantity: item.quantity,
             specialInstructions: item.specialInstructions ?? null,
             status: 'PENDING',

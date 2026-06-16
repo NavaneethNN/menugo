@@ -142,6 +142,7 @@ model Order {
   tableSessionId String
   tableSession   TableSession @relation(fields: [tableSessionId], references: [id])
   status         OrderStatus  @default(PLACED)
+  workflowMode   WorkflowMode
   createdAt      DateTime     @default(now())
 
   items OrderItem[]
