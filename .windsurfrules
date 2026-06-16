@@ -67,6 +67,7 @@
 - **AFTER EACH SUB-PHASE (2.1, 2.2, etc.):** Auto-commit with descriptive message
   - Format: `git add -A && git commit -m "phase X.Y: brief description"`
   - Example: `git commit -m "phase 2.1: add categories CRUD endpoints"`
+  Before starting a new phase ( phase 2, phase 3)  create a new branch and switch to it. 
 - **AFTER EACH FULL PHASE (Phase 2, Phase 3, etc.):**
   1. Push current branch: `git push origin main`
   2. Create new branch for next phase: `git checkout -b phase-X`
