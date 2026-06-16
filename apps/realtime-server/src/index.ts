@@ -1,3 +1,4 @@
+import { config } from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import type {
@@ -8,6 +9,9 @@ import type {
   StaffRole,
 } from '@restaurant/shared-types';
 import { verifyToken } from './lib/auth';
+import { setIoInstance, emitToRoom } from './lib/emit';
+
+config();
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 4000;
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
@@ -22,6 +26,48 @@ const httpServer = createServer((req, res) => {
     }));
     return;
   }
+
+  if (req.url === '/internal/emit' && req.method === 'POST') {
+    const INTERNAL_SECRET = process.env.INTERNAL_SECRET;
+    if (!INTERNAL_SECRET) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'INTERNAL_SECRET not configured' }));
+      return;
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader.slice(7) !== INTERNAL_SECRET) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid or missing authorization token' }));
+      return;
+    }
+
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+
+    req.on('end', () => {
+      try {
+        const { room, event, payload } = JSON.parse(body);
+        if (!room || !event || payload === undefined) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing required fields: room, event, payload' }));
+          return;
+        }
+
+        emitToRoom(room, event, payload);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: `Emitted ${event} to room ${room}` }));
+      } catch (error) {
+        console.error('[internal/emit] Error processing request:', error);
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON payload' }));
+      }
+    });
+    return;
+  }
+
   res.writeHead(404);
   res.end();
 });
@@ -96,6 +142,8 @@ function validateRoomAccess(socketId: string, roomId: string, socketData: Partia
 
   return false;
 }
+
+setIoInstance(io);
 
 io.on('connection', (socket) => {
   console.log(`[socket] connected: ${socket.id}, role: ${socket.data.role || 'CUSTOMER'}`);
