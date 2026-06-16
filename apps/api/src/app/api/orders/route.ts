@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@restaurant/db';
 import { verifySessionToken } from '@/lib/auth';
+import { emitEvent } from '@/lib/realtime';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -90,8 +91,59 @@ export async function POST(req: NextRequest) {
         }),
       },
     },
-    include: { items: true },
+    include: { items: { include: { menuItem: true } } },
   });
+
+  // Emit events based on workflow mode
+  const { workflowMode } = session.table.restaurant;
+  const restaurantId = session.table.restaurantId;
+  
+  if (workflowMode === 'ASSISTED_DINING') {
+    // Emit to waiter room for assisted dining
+    await emitEvent(
+      `restaurant:${restaurantId}:waiter`,
+      'order:new_full',
+      {
+        orderId: order.id,
+        tableNumber: session.table.number,
+        items: order.items.map(item => ({
+          orderItemId: item.id,
+          name: item.menuItem.name,
+          qty: item.quantity,
+          specialInstructions: item.specialInstructions,
+        })),
+      }
+    );
+  } else {
+    // Managed Dining and Self Collection: emit to individual kitchen rooms
+    const kitchenGroups = new Map<string, typeof order.items>();
+    
+    for (const item of order.items) {
+      const kitchenId = item.kitchenId;
+      if (!kitchenGroups.has(kitchenId)) {
+        kitchenGroups.set(kitchenId, []);
+      }
+      kitchenGroups.get(kitchenId)!.push(item);
+    }
+
+    for (const [kitchenId, kitchenItems] of kitchenGroups) {
+      await emitEvent(
+        `restaurant:${restaurantId}:kitchen:${kitchenId}`,
+        'order:new',
+        {
+          orderId: order.id,
+          tableNumber: session.table.number,
+          items: kitchenItems.map(item => ({
+            orderItemId: item.id,
+            name: item.menuItem.name,
+            qty: item.quantity,
+            specialInstructions: item.specialInstructions,
+            kitchenName: `Kitchen ${kitchenId}`, // TODO: Get actual kitchen name
+          })),
+        }
+      );
+    }
+  }
 
   return NextResponse.json(order, { status: 201 });
 }

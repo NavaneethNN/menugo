@@ -1,12 +1,19 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { io } from 'socket.io-client';
-import { CheckCircle, Clock, ChefHat, PackageCheck } from 'lucide-react';
+import { CheckCircle, Clock, ChefHat, PackageCheck, WifiOff } from 'lucide-react';
 import type { Order, OrderItemStatus } from '@restaurant/shared-types';
-import type { OrderItemStatusUpdateEvent } from '@restaurant/shared-types';
+import type { 
+  OrderItemStatusUpdateEvent,
+  OrderPartiallyReadyEvent,
+  OrderFullyReadyEvent,
+  OrderItemReadyForPickupEvent,
+  OrderCompletedEvent,
+  SessionClosedEvent
+} from '@restaurant/shared-types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL ?? 'http://localhost:4000';
@@ -39,6 +46,8 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const socketRef = useRef<ReturnType<typeof io> | null>(null);
+  const [isReconnecting, setIsReconnecting] = useState(false);
+  const [sessionEnded, setSessionEnded] = useState(false);
 
   const { data: order, isLoading } = useQuery<Order>({
     queryKey: ['order', params.orderId],
@@ -54,8 +63,26 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
     const sessionId = sessionStorage.getItem('sessionId');
     if (!sessionId) return;
 
-    const socket = io(SOCKET_URL, { transports: ['websocket'] });
+    const socket = io(SOCKET_URL, { 
+      transports: ['websocket'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+    });
     socketRef.current = socket;
+
+    // Reconnection handling
+    let reconnectTimeout: NodeJS.Timeout;
+    socket.on('disconnect', () => {
+      setIsReconnecting(true);
+      reconnectTimeout = setTimeout(() => {
+        setIsReconnecting(false);
+      }, 3000);
+    });
+
+    socket.on('connect', () => {
+      setIsReconnecting(false);
+      clearTimeout(reconnectTimeout);
+    });
 
     socket.emit('join_room', `session:${sessionId}`);
 
@@ -71,12 +98,51 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
       });
     });
 
-    socket.on('order:completed', () => {
-      queryClient.invalidateQueries({ queryKey: ['order', params.orderId] });
+    socket.on('order:partially_ready', (data: OrderPartiallyReadyEvent) => {
+      queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
+        if (!old) return old;
+        return { ...old, status: 'PARTIALLY_READY' };
+      });
+    });
+
+    socket.on('order:fully_ready', (data: OrderFullyReadyEvent) => {
+      queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
+        if (!old) return old;
+        return { ...old, status: 'FULLY_READY' };
+      });
+    });
+
+    socket.on('order:item_ready_for_pickup', (data: OrderItemReadyForPickupEvent) => {
+      // Update the specific item status in cache
+      queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          items: old.items.map((item) =>
+            item.id === data.orderItemId ? { ...item, status: 'READY' } : item
+          ),
+        };
+      });
+    });
+
+    socket.on('order:completed', (data: OrderCompletedEvent) => {
+      queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          status: 'COMPLETED',
+          items: old.items.map((item) => ({ ...item, status: 'SERVED' })),
+        };
+      });
+    });
+
+    socket.on('session:closed', (data: SessionClosedEvent) => {
+      setSessionEnded(true);
     });
 
     return () => {
       socket.disconnect();
+      clearTimeout(reconnectTimeout);
     };
   }, [params.orderId, queryClient]);
 
@@ -95,6 +161,14 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
 
   return (
     <div className="min-h-screen pb-24 bg-gray-50">
+      {/* Reconnection Banner */}
+      {isReconnecting && (
+        <div className="bg-orange-50 border-b border-orange-200 px-4 py-2 flex items-center gap-2">
+          <WifiOff className="w-4 h-4 text-orange-600" />
+          <p className="text-sm text-orange-800">Reconnecting...</p>
+        </div>
+      )}
+
       <header className="bg-white border-b border-gray-100 px-4 py-4">
         <h1 className="text-lg font-bold text-gray-900">Order Tracker</h1>
         <p className="text-sm text-gray-500">Table {sessionStorage.getItem('tableNumber')}</p>
@@ -102,6 +176,11 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
 
       {/* Status Banner */}
       <div className="mx-4 mt-4">
+        {sessionEnded && (
+          <div className="rounded-2xl bg-red-50 border border-red-200 p-4">
+            <p className="text-sm text-red-800">Your session has ended. You can no longer place new orders.</p>
+          </div>
+        )}
         {allServed && (
           <div className="rounded-2xl bg-green-50 border border-green-200 p-4 flex items-center gap-3">
             <CheckCircle className="w-6 h-6 text-green-600 shrink-0" />
@@ -174,7 +253,12 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
             const restaurantId = sessionStorage.getItem('restaurantId');
             if (restaurantId) router.push(`/menu/${restaurantId}`);
           }}
-          className="w-full py-3 rounded-2xl border-2 border-brand-500 text-brand-600 font-semibold hover:bg-brand-50 transition-colors"
+          disabled={sessionEnded}
+          className={`w-full py-3 rounded-2xl border-2 font-semibold transition-colors ${
+            sessionEnded
+              ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+              : 'border-brand-500 text-brand-600 hover:bg-brand-50'
+          }`}
         >
           + Order more
         </button>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@restaurant/db';
 import { computeOrderStatus } from '@/lib/order-status';
+import { emitEvent } from '@/lib/realtime';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -18,7 +19,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   const order = await prisma.order.findUnique({
     where: { id: params.id },
-    include: { items: true },
+    include: { 
+      items: true,
+      tableSession: { 
+        include: { 
+          table: { 
+            include: { restaurant: true } 
+          } 
+        } 
+      } 
+    },
   });
 
   if (!order) {
@@ -43,6 +53,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     data: { status: newOrderStatus },
     include: { items: true },
   });
+
+  // Emit order completed event when order becomes COMPLETED
+  if (newOrderStatus === 'COMPLETED') {
+    await emitEvent(
+      `session:${order.tableSessionId}`,
+      'order:completed',
+      {
+        orderId: order.id,
+      }
+    );
+  }
 
   return NextResponse.json(updated);
 }

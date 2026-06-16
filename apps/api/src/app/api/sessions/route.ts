@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@restaurant/db';
 import { signSessionToken } from '@/lib/auth';
+import { emitEvent } from '@/lib/realtime';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -55,6 +56,26 @@ export async function POST(req: NextRequest) {
     tableId: table.id,
     restaurantId: table.restaurantId,
   });
+
+  // Emit table seats updated event to cashier and admin rooms
+  const newAvailableSeats = table.totalSeats - occupiedSeats - seatsOccupied;
+  await emitEvent(
+    `restaurant:${table.restaurantId}:cashier`,
+    'table:seats_updated',
+    {
+      tableId: table.id,
+      availableSeats: newAvailableSeats,
+    }
+  );
+
+  await emitEvent(
+    `restaurant:${table.restaurantId}:admin`,
+    'table:seats_updated',
+    {
+      tableId: table.id,
+      availableSeats: newAvailableSeats,
+    }
+  );
 
   return NextResponse.json({
     sessionId: session.id,
