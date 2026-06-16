@@ -21,6 +21,13 @@ export default function MenuPage({ params }: { params: { restaurantId: string } 
   const [cart, setCart] = useState<Record<string, CartItem>>({});
   const [showCart, setShowCart] = useState(false);
 
+  useEffect(() => {
+    const sessionId = sessionStorage.getItem('sessionId');
+    if (!sessionId) {
+      router.replace('/?error=session_expired');
+    }
+  }, [router]);
+
   const { data, isLoading } = useQuery<MenuResponse>({
     queryKey: ['menu', params.restaurantId],
     queryFn: async () => {
