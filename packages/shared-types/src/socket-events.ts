@@ -89,6 +89,7 @@ export interface ServerToClientEvents {
   'order:completed': (data: OrderCompletedEvent) => void;
   'session:closed': (data: SessionClosedEvent) => void;
   'table:seats_updated': (data: TableSeatsUpdatedEvent) => void;
+  'error': (data: { message: string }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -100,7 +101,8 @@ export interface ClientToServerEvents {
 export interface InterServerEvents {}
 
 export interface SocketData {
-  restaurantId: string;
+  staffId?: string;
+  restaurantId?: string;
   role?: 'KITCHEN' | 'WAITER' | 'CASHIER' | 'ADMIN' | 'CUSTOMER';
   kitchenId?: string;
   tableSessionId?: string;
