@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@restaurant/db';
 import { signStaffToken } from '@/lib/auth';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
 
 const schema = z.object({
   restaurantId: z.string(),
@@ -18,10 +19,10 @@ export async function POST(req: NextRequest) {
   const { restaurantId, pin } = parse.data;
 
   const staff = await prisma.staff.findFirst({
-    where: { restaurantId, pin, isActive: true },
+    where: { restaurantId, isActive: true },
   });
 
-  if (!staff) {
+  if (!staff || !(await bcrypt.compare(pin, staff.pin))) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
