@@ -80,8 +80,6 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
     };
   }, [params.orderId, queryClient]);
 
-  const workflowMode = order.workflowMode;
-
   if (isLoading || !order) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -93,6 +91,7 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
   const allServed = order.items.every((i) => i.status === 'SERVED');
   const allReady = order.items.every((i) => i.status === 'READY' || i.status === 'SERVED');
   const anyReady = order.items.some((i) => i.status === 'READY');
+  const workflowMode = order.workflowMode;
 
   return (
     <div className="min-h-screen pb-24 bg-gray-50">

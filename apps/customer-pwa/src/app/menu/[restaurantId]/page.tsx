@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ShoppingCart, Minus, Plus, ChevronRight, Loader2 } from 'lucide-react';
-import type { MenuResponse } from '@restaurant/shared-types';
+import type { MenuResponse, MenuItem } from '@restaurant/shared-types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
