@@ -1,14 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@restaurant/db';
 import { computeOrderStatus } from '@/lib/order-status';
+import { verifyStaffToken } from '@/lib/auth';
 import { emitEvent } from '@/lib/realtime';
 import { z } from 'zod';
+import type { OrderItemStatus } from '@restaurant/shared-types';
 
 const schema = z.object({
   status: z.enum(['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED']),
 });
 
+const VALID_TRANSITIONS: Partial<Record<OrderItemStatus, OrderItemStatus>> = {
+  PENDING: 'ACCEPTED',
+  ACCEPTED: 'PREPARING',
+  PREPARING: 'READY',
+};
+
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const token = req.headers.get('authorization')?.split(' ')[1];
+  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  let staffPayload;
+  try {
+    staffPayload = await verifyStaffToken(token);
+  } catch {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+  }
+
+  if (staffPayload.role !== 'KITCHEN' || !staffPayload.kitchenId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const body = await req.json();
   const parse = schema.safeParse(body);
   if (!parse.success) {
@@ -16,6 +38,23 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 
   const { status } = parse.data;
+
+  const existing = await prisma.orderItem.findUnique({ where: { id: params.id } });
+  if (!existing) {
+    return NextResponse.json({ error: 'Order item not found' }, { status: 404 });
+  }
+
+  if (existing.kitchenId !== staffPayload.kitchenId) {
+    return NextResponse.json({ error: 'Forbidden: item belongs to a different kitchen' }, { status: 403 });
+  }
+
+  const expectedNext = VALID_TRANSITIONS[existing.status as OrderItemStatus];
+  if (status !== expectedNext) {
+    return NextResponse.json(
+      { error: `Invalid transition: ${existing.status} → ${status}. Expected: ${existing.status} → ${expectedNext ?? '(none)'}` },
+      { status: 400 }
+    );
+  }
 
   const item = await prisma.orderItem.update({
     where: { id: params.id },

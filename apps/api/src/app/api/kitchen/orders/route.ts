@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const items = await prisma.orderItem.findMany({
     where: {
       kitchenId: payload.kitchenId,
-      status: { in: ['PENDING', 'ACCEPTED', 'PREPARING'] },
+      status: { in: ['PENDING', 'ACCEPTED', 'PREPARING', 'READY'] },
     },
     include: {
       menuItem: { select: { name: true, imageUrl: true } },
