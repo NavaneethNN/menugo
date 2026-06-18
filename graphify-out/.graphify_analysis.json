@@ -1,16 +1,25 @@
 {
   "communities": {
     "0": [
+      "app_login_loginscreen",
+      "app_login_styles",
       "apps_customer_pwa_src_app_menu_restaurantid_page_tsx",
       "apps_customer_pwa_src_app_track_orderid_page_tsx",
+      "apps_staff_app_app_kitchen_index_tsx",
+      "apps_staff_app_app_login_tsx",
+      "apps_staff_app_src_store_auth_ts",
+      "kitchen_index_kitchenscreen",
+      "kitchen_index_next_status",
+      "kitchen_index_styles",
+      "lib_auth_stafftokenpayload",
       "orderid_page_status_color",
       "orderid_page_status_icons",
+      "orderid_page_status_labels",
       "orderid_page_trackpage",
       "packages_shared_types_src_api_ts",
       "packages_shared_types_src_enums_ts",
       "packages_shared_types_src_index_ts",
       "packages_shared_types_src_models_ts",
-      "plan_restaurant",
       "plan_table",
       "plan_table_session",
       "plan_workflow_mode",
@@ -33,24 +42,70 @@
       "src_api_menuresponse",
       "src_api_updateorderitemstatusrequest",
       "src_enums_orderitemstatus",
-      "src_enums_orderstatus",
       "src_enums_sessionstatus",
+      "src_enums_staffrole",
       "src_models_category",
       "src_models_kitchen",
       "src_models_menuitem",
-      "src_models_order",
       "src_models_orderitem",
+      "src_models_restaurant",
+      "src_models_staff",
       "src_models_table",
-      "src_socket_events_orderitemstatusupdateevent"
+      "src_socket_events_orderitemstatusupdateevent",
+      "store_auth_authstate"
     ],
     "1": [
+      "api_package_devdependencies",
+      "api_package_devdependencies_eslint",
+      "api_package_devdependencies_eslint_config_next",
+      "api_package_devdependencies_types_bcrypt",
+      "api_package_devdependencies_types_node",
+      "api_package_devdependencies_types_qrcode",
+      "api_package_devdependencies_types_react",
+      "api_package_devdependencies_types_react_dom",
+      "api_package_devdependencies_typescript",
+      "apps_customer_pwa_package_json",
+      "customer_pwa_package_dependencies",
+      "customer_pwa_package_dependencies_clsx",
+      "customer_pwa_package_dependencies_lucide_react",
+      "customer_pwa_package_dependencies_next",
+      "customer_pwa_package_dependencies_react",
+      "customer_pwa_package_dependencies_react_dom",
+      "customer_pwa_package_dependencies_restaurant_shared_types",
+      "customer_pwa_package_dependencies_socket_io_client",
+      "customer_pwa_package_dependencies_tailwind_merge",
+      "customer_pwa_package_dependencies_tanstack_react_query",
+      "customer_pwa_package_devdependencies",
+      "customer_pwa_package_devdependencies_autoprefixer",
+      "customer_pwa_package_devdependencies_eslint",
+      "customer_pwa_package_devdependencies_eslint_config_next",
+      "customer_pwa_package_devdependencies_postcss",
+      "customer_pwa_package_devdependencies_sharp",
+      "customer_pwa_package_devdependencies_tailwindcss",
+      "customer_pwa_package_devdependencies_types_node",
+      "customer_pwa_package_devdependencies_types_react",
+      "customer_pwa_package_devdependencies_typescript",
+      "customer_pwa_package_name",
+      "customer_pwa_package_private",
+      "customer_pwa_package_scripts",
+      "customer_pwa_package_scripts_build",
+      "customer_pwa_package_scripts_dev",
+      "customer_pwa_package_scripts_lint",
+      "customer_pwa_package_scripts_start",
+      "customer_pwa_package_scripts_typecheck",
+      "customer_pwa_package_version"
+    ],
+    "2": [
       "apps_staff_app_package_json",
       "staff_app_package_dependencies",
+      "staff_app_package_dependencies_aws_sdk_client_s3",
+      "staff_app_package_dependencies_aws_sdk_s3_request_presigner",
       "staff_app_package_dependencies_expo",
       "staff_app_package_dependencies_expo_audio",
       "staff_app_package_dependencies_expo_constants",
       "staff_app_package_dependencies_expo_notifications",
       "staff_app_package_dependencies_expo_router",
+      "staff_app_package_dependencies_expo_sharing",
       "staff_app_package_dependencies_expo_status_bar",
       "staff_app_package_dependencies_lucide_react_native",
       "staff_app_package_dependencies_react",
@@ -79,42 +134,6 @@
       "staff_app_package_scripts_typecheck",
       "staff_app_package_scripts_web",
       "staff_app_package_version"
-    ],
-    "2": [
-      "apps_api_src_app_api_kitchen_orders_route_ts",
-      "apps_api_src_app_api_order_items_id_status_route_ts",
-      "apps_api_src_app_api_orders_id_route_ts",
-      "apps_api_src_app_api_orders_id_served_route_ts",
-      "apps_api_src_app_api_orders_route_ts",
-      "apps_api_src_app_api_restaurants_id_menu_route_ts",
-      "apps_api_src_app_api_sessions_id_close_route_ts",
-      "apps_api_src_app_api_sessions_route_ts",
-      "apps_api_src_app_api_staff_login_route_ts",
-      "apps_api_src_lib_auth_ts",
-      "close_route_patch",
-      "id_route_get",
-      "lib_auth_jwt_secret",
-      "lib_auth_sessiontokenpayload",
-      "lib_auth_signsessiontoken",
-      "lib_auth_signstafftoken",
-      "lib_auth_stafftokenpayload",
-      "lib_auth_verifysessiontoken",
-      "lib_auth_verifystafftoken",
-      "lib_order_status_computeorderstatus",
-      "login_route_post",
-      "login_route_schema",
-      "menu_route_get",
-      "orders_route_get",
-      "orders_route_post",
-      "orders_route_schema",
-      "packages_db_src_index_ts",
-      "served_route_patch",
-      "served_route_schema",
-      "sessions_route_post",
-      "sessions_route_schema",
-      "src_index_globalforprisma",
-      "status_route_patch",
-      "status_route_schema"
     ],
     "3": [
       "apps_customer_pwa_public_manifest_json",
@@ -151,34 +170,37 @@
       "staff_app_app_web_favicon"
     ],
     "4": [
-      "apps_customer_pwa_package_json",
-      "customer_pwa_package_dependencies",
-      "customer_pwa_package_dependencies_clsx",
-      "customer_pwa_package_dependencies_lucide_react",
-      "customer_pwa_package_dependencies_next",
-      "customer_pwa_package_dependencies_react",
-      "customer_pwa_package_dependencies_react_dom",
-      "customer_pwa_package_dependencies_restaurant_shared_types",
-      "customer_pwa_package_dependencies_socket_io_client",
-      "customer_pwa_package_dependencies_tailwind_merge",
-      "customer_pwa_package_dependencies_tanstack_react_query",
-      "customer_pwa_package_devdependencies",
-      "customer_pwa_package_devdependencies_autoprefixer",
-      "customer_pwa_package_devdependencies_postcss",
-      "customer_pwa_package_devdependencies_tailwindcss",
-      "customer_pwa_package_devdependencies_types_node",
-      "customer_pwa_package_devdependencies_types_react",
-      "customer_pwa_package_devdependencies_types_react_dom",
-      "customer_pwa_package_devdependencies_typescript",
-      "customer_pwa_package_name",
-      "customer_pwa_package_private",
-      "customer_pwa_package_scripts",
-      "customer_pwa_package_scripts_build",
-      "customer_pwa_package_scripts_dev",
-      "customer_pwa_package_scripts_lint",
-      "customer_pwa_package_scripts_start",
-      "customer_pwa_package_scripts_typecheck",
-      "customer_pwa_package_version"
+      "apps_api_src_app_api_order_items_id_status_route_ts",
+      "apps_api_src_app_api_orders_id_route_ts",
+      "apps_api_src_app_api_orders_id_served_route_ts",
+      "apps_api_src_app_api_orders_route_ts",
+      "apps_api_src_app_api_restaurants_id_menu_route_ts",
+      "apps_api_src_app_api_sessions_id_close_route_ts",
+      "apps_api_src_app_api_sessions_route_ts",
+      "apps_api_src_app_api_staff_login_route_ts",
+      "apps_api_src_lib_realtime_ts",
+      "close_route_patch",
+      "id_route_get",
+      "lib_auth_signsessiontoken",
+      "lib_auth_signstafftoken",
+      "lib_auth_verifysessiontoken",
+      "lib_order_status_computeorderstatus",
+      "lib_realtime_emitevent",
+      "login_route_post",
+      "login_route_schema",
+      "menu_route_get",
+      "orders_route_post",
+      "orders_route_schema",
+      "packages_db_src_index_ts",
+      "served_route_patch",
+      "served_route_schema",
+      "sessions_route_post",
+      "sessions_route_schema",
+      "src_enums_orderstatus",
+      "src_index_globalforprisma",
+      "src_models_order",
+      "status_route_patch",
+      "status_route_schema"
     ],
     "5": [
       "package_json",
@@ -209,7 +231,89 @@
       "restaurant_package_workspaces"
     ],
     "6": [
+      "apps_realtime_server_src_index_ts",
+      "apps_realtime_server_src_lib_auth_ts",
+      "apps_realtime_server_src_lib_auth_ts_lib_auth_jwt_secret",
+      "apps_realtime_server_src_lib_auth_ts_lib_auth_stafftokenpayload",
+      "apps_realtime_server_src_lib_emit_ts",
+      "lib_auth_verifytoken",
+      "lib_emit_emittoroom",
+      "lib_emit_setioinstance",
+      "socket_events_ts",
+      "src_index_httpserver",
+      "src_index_io",
+      "src_index_validateroomaccess",
+      "src_index_validrooms",
+      "src_socket_events_clienttoserverevents",
+      "src_socket_events_eventorderitem",
+      "src_socket_events_interserverevents",
+      "src_socket_events_ordercompletedevent",
+      "src_socket_events_orderfullyreadyevent",
+      "src_socket_events_orderitemreadyforpickupevent",
+      "src_socket_events_ordernewevent",
+      "src_socket_events_ordernewfullevent",
+      "src_socket_events_orderpartiallyreadyevent",
+      "src_socket_events_servertoclientevents",
+      "src_socket_events_sessionclosedevent",
+      "src_socket_events_socketdata",
+      "src_socket_events_tableseatsupdatedevent"
+    ],
+    "7": [
+      "apps_staff_app_app_admin_menu_category_form_tsx",
+      "apps_staff_app_app_admin_menu_index_tsx",
+      "apps_staff_app_app_admin_menu_item_form_tsx",
+      "menu_category_form_categoryform",
+      "menu_category_form_categoryformprops",
+      "menu_category_form_createcategory",
+      "menu_category_form_styles",
+      "menu_category_form_updatecategory",
+      "menu_index_category",
+      "menu_index_fetchcategories",
+      "menu_index_fetchmenuitems",
+      "menu_index_menuitem",
+      "menu_index_menuscreen",
+      "menu_index_styles",
+      "menu_index_toggleavailability",
+      "menu_item_form_category",
+      "menu_item_form_createitem",
+      "menu_item_form_fetchcategories",
+      "menu_item_form_fetchkitchens",
+      "menu_item_form_itemform",
+      "menu_item_form_itemformprops",
+      "menu_item_form_kitchen",
+      "menu_item_form_styles",
+      "menu_item_form_updateitem"
+    ],
+    "8": [
+      "api_app",
+      "apps_api",
+      "apps_realtime_server",
+      "apps_staff_app",
+      "concept_managed_dining",
+      "concept_self_collection",
+      "customer_pwa_app",
+      "db_package",
+      "packages_db",
+      "packages_shared_types",
+      "phase2_admin_module",
+      "phase2_test_md",
+      "phase3_customer_module",
+      "phase3_test_md",
+      "phase4_realtime_server",
+      "phase5_kitchen_module",
+      "phase6_waiter_module",
+      "phase8_cashier_module",
+      "prisma_schema",
+      "realtime_lib",
+      "realtime_server_app",
+      "shared_types_package",
+      "staff_app_app"
+    ],
+    "9": [
       "api_package_dependencies",
+      "api_package_dependencies_aws_sdk_client_s3",
+      "api_package_dependencies_aws_sdk_s3_request_presigner",
+      "api_package_dependencies_bcrypt",
       "api_package_dependencies_jose",
       "api_package_dependencies_next",
       "api_package_dependencies_qrcode",
@@ -217,11 +321,6 @@
       "api_package_dependencies_react_dom",
       "api_package_dependencies_restaurant_shared_types",
       "api_package_dependencies_zod",
-      "api_package_devdependencies",
-      "api_package_devdependencies_types_node",
-      "api_package_devdependencies_types_qrcode",
-      "api_package_devdependencies_types_react",
-      "api_package_devdependencies_typescript",
       "api_package_name",
       "api_package_private",
       "api_package_scripts",
@@ -231,9 +330,10 @@
       "api_package_scripts_start",
       "api_package_scripts_typecheck",
       "api_package_version",
-      "apps_api_package_json"
+      "apps_api_package_json",
+      "plan_restaurant"
     ],
-    "7": [
+    "10": [
       "api_tsconfig_compileroptions",
       "api_tsconfig_compileroptions_allowjs",
       "api_tsconfig_compileroptions_exactoptionalpropertytypes",
@@ -254,7 +354,7 @@
       "api_tsconfig_paths",
       "apps_api_tsconfig_json"
     ],
-    "8": [
+    "11": [
       "apps_customer_pwa_tsconfig_json",
       "customer_pwa_tsconfig_compileroptions",
       "customer_pwa_tsconfig_compileroptions_allowjs",
@@ -275,7 +375,7 @@
       "customer_pwa_tsconfig_include",
       "customer_pwa_tsconfig_paths"
     ],
-    "9": [
+    "12": [
       "db_package_dependencies",
       "db_package_dependencies_prisma_client",
       "db_package_devdependencies",
@@ -296,7 +396,28 @@
       "db_package_version",
       "packages_db_package_json"
     ],
-    "10": [
+    "13": [
+      "apps_realtime_server_package_json",
+      "realtime_server_package_dependencies",
+      "realtime_server_package_dependencies_dotenv",
+      "realtime_server_package_dependencies_jose",
+      "realtime_server_package_dependencies_restaurant_shared_types",
+      "realtime_server_package_dependencies_socket_io",
+      "realtime_server_package_devdependencies",
+      "realtime_server_package_devdependencies_tsx",
+      "realtime_server_package_devdependencies_types_node",
+      "realtime_server_package_devdependencies_typescript",
+      "realtime_server_package_main",
+      "realtime_server_package_name",
+      "realtime_server_package_private",
+      "realtime_server_package_scripts",
+      "realtime_server_package_scripts_build",
+      "realtime_server_package_scripts_dev",
+      "realtime_server_package_scripts_start",
+      "realtime_server_package_scripts_typecheck",
+      "realtime_server_package_version"
+    ],
+    "14": [
       "restaurant_tsconfig_base_compileroptions",
       "restaurant_tsconfig_base_compileroptions_declaration",
       "restaurant_tsconfig_base_compileroptions_esmoduleinterop",
@@ -317,63 +438,7 @@
       "restaurant_tsconfig_base_schema",
       "tsconfig_base_json"
     ],
-    "11": [
-      "apps_realtime_server_package_json",
-      "realtime_server_package_dependencies",
-      "realtime_server_package_dependencies_jose",
-      "realtime_server_package_dependencies_restaurant_shared_types",
-      "realtime_server_package_dependencies_socket_io",
-      "realtime_server_package_devdependencies",
-      "realtime_server_package_devdependencies_tsx",
-      "realtime_server_package_devdependencies_types_node",
-      "realtime_server_package_devdependencies_typescript",
-      "realtime_server_package_main",
-      "realtime_server_package_name",
-      "realtime_server_package_private",
-      "realtime_server_package_scripts",
-      "realtime_server_package_scripts_build",
-      "realtime_server_package_scripts_dev",
-      "realtime_server_package_scripts_start",
-      "realtime_server_package_scripts_typecheck",
-      "realtime_server_package_version"
-    ],
-    "12": [
-      "apps_realtime_server_src_index_ts",
-      "packages_shared_types_src_socket_events_ts",
-      "src_index_httpserver",
-      "src_index_io",
-      "src_socket_events_clienttoserverevents",
-      "src_socket_events_eventorderitem",
-      "src_socket_events_interserverevents",
-      "src_socket_events_ordercompletedevent",
-      "src_socket_events_orderfullyreadyevent",
-      "src_socket_events_orderitemreadyforpickupevent",
-      "src_socket_events_ordernewevent",
-      "src_socket_events_ordernewfullevent",
-      "src_socket_events_orderpartiallyreadyevent",
-      "src_socket_events_servertoclientevents",
-      "src_socket_events_sessionclosedevent",
-      "src_socket_events_socketdata",
-      "src_socket_events_tableseatsupdatedevent"
-    ],
-    "13": [
-      "app_index_index",
-      "app_login_loginscreen",
-      "app_login_styles",
-      "apps_staff_app_app_index_tsx",
-      "apps_staff_app_app_kitchen_index_tsx",
-      "apps_staff_app_app_login_tsx",
-      "apps_staff_app_src_store_auth_ts",
-      "kitchen_index_kitchenscreen",
-      "kitchen_index_next_status",
-      "kitchen_index_styles",
-      "orderid_page_status_labels",
-      "src_enums_staffrole",
-      "src_models_staff",
-      "store_auth_authstate",
-      "store_auth_useauthstore"
-    ],
-    "14": [
+    "15": [
       "restaurant_turbo_build_outputs",
       "restaurant_turbo_dev_cache",
       "restaurant_turbo_dev_persistent",
@@ -389,21 +454,19 @@
       "restaurant_turbo_tasks_typecheck",
       "turbo_json"
     ],
-    "15": [
-      "api_app",
-      "customer_pwa_app",
-      "db_package",
-      "phase2_admin_module",
-      "phase3_customer_module",
-      "phase4_realtime_server",
-      "phase5_kitchen_module",
-      "phase6_waiter_module",
-      "phase8_cashier_module",
-      "realtime_server_app",
-      "shared_types_package",
-      "staff_app_app"
-    ],
     "16": [
+      "apps_api_src_app_api_admin_sessions_route_ts",
+      "apps_api_src_app_api_admin_tables_id_qr_route_ts",
+      "apps_api_src_app_api_kitchen_orders_route_ts",
+      "lib_auth_verifystafftoken",
+      "orders_route_get",
+      "qr_route_get",
+      "qr_route_verifyadmin",
+      "sessions_route_get",
+      "sessions_route_queryschema",
+      "sessions_route_verifyadmin"
+    ],
+    "17": [
       "apps_realtime_server_tsconfig_json",
       "realtime_server_tsconfig_compileroptions",
       "realtime_server_tsconfig_compileroptions_lib",
@@ -415,7 +478,7 @@
       "realtime_server_tsconfig_extends",
       "realtime_server_tsconfig_include"
     ],
-    "17": [
+    "18": [
       "packages_shared_types_package_json",
       "shared_types_package_devdependencies",
       "shared_types_package_devdependencies_typescript",
@@ -427,7 +490,18 @@
       "shared_types_package_types",
       "shared_types_package_version"
     ],
-    "18": [
+    "19": [
+      "apps_staff_app_app_admin_staff_staff_form_tsx",
+      "staff_staff_form_createstaff",
+      "staff_staff_form_fetchkitchens",
+      "staff_staff_form_kitchen",
+      "staff_staff_form_roles",
+      "staff_staff_form_staffform",
+      "staff_staff_form_staffformprops",
+      "staff_staff_form_styles",
+      "staff_staff_form_updatestaff"
+    ],
+    "20": [
       "db_tsconfig_compileroptions",
       "db_tsconfig_compileroptions_module",
       "db_tsconfig_compileroptions_moduleresolution",
@@ -438,7 +512,7 @@
       "db_tsconfig_include",
       "packages_db_tsconfig_json"
     ],
-    "19": [
+    "21": [
       "packages_shared_types_tsconfig_json",
       "shared_types_tsconfig_compileroptions",
       "shared_types_tsconfig_compileroptions_module",
@@ -449,7 +523,54 @@
       "shared_types_tsconfig_extends",
       "shared_types_tsconfig_include"
     ],
-    "20": [
+    "22": [
+      "apps_staff_app_app_admin_kitchens_index_tsx",
+      "kitchens_index_createkitchen",
+      "kitchens_index_deletekitchen",
+      "kitchens_index_fetchkitchens",
+      "kitchens_index_kitchen",
+      "kitchens_index_kitchensscreen",
+      "kitchens_index_styles",
+      "kitchens_index_updatekitchen"
+    ],
+    "23": [
+      "apps_staff_app_app_admin_sessions_index_tsx",
+      "sessions_index_fetchsessions",
+      "sessions_index_forcecleartable",
+      "sessions_index_formatduration",
+      "sessions_index_session",
+      "sessions_index_sessionsscreen",
+      "sessions_index_sessionstatus",
+      "sessions_index_styles"
+    ],
+    "24": [
+      "apps_staff_app_app_admin_settings_index_tsx",
+      "settings_index_fetchrestaurant",
+      "settings_index_modes",
+      "settings_index_restaurant",
+      "settings_index_settingsscreen",
+      "settings_index_styles",
+      "settings_index_updateworkflowmode"
+    ],
+    "25": [
+      "apps_staff_app_app_admin_staff_index_tsx",
+      "staff_index_fetchstaff",
+      "staff_index_roleconfig",
+      "staff_index_staff",
+      "staff_index_staffscreen",
+      "staff_index_styles",
+      "staff_index_togglestaffactive"
+    ],
+    "26": [
+      "apps_api_src_app_api_admin_menu_items_id_availability_route_ts",
+      "apps_api_src_lib_auth_ts",
+      "availability_route_patch",
+      "availability_route_toggleschema",
+      "availability_route_verifyadmin",
+      "lib_auth_jwt_secret",
+      "lib_auth_sessiontokenpayload"
+    ],
+    "27": [
       "graphify_json",
       "restaurant_graphify_dataflows",
       "restaurant_graphify_description",
@@ -458,7 +579,7 @@
       "restaurant_graphify_nodes",
       "restaurant_graphify_version"
     ],
-    "21": [
+    "28": [
       "apps_staff_app_tsconfig_json",
       "staff_app_tsconfig_compileroptions",
       "staff_app_tsconfig_compileroptions_paths",
@@ -467,108 +588,292 @@
       "staff_app_tsconfig_include",
       "staff_app_tsconfig_paths"
     ],
-    "22": [
+    "29": [
+      "apps_staff_app_app_admin_tables_index_tsx",
+      "tables_index_deletetable",
+      "tables_index_fetchtables",
+      "tables_index_styles",
+      "tables_index_table",
+      "tables_index_tablesscreen"
+    ],
+    "30": [
+      "apps_staff_app_app_admin_tables_table_form_tsx",
+      "tables_table_form_createtable",
+      "tables_table_form_styles",
+      "tables_table_form_tableform",
+      "tables_table_form_tableformprops",
+      "tables_table_form_updatetable"
+    ],
+    "31": [
+      "apps_api_src_app_api_admin_menu_items_id_route_ts",
+      "apps_api_src_app_api_admin_menu_items_id_route_ts_id_route_delete",
+      "apps_api_src_app_api_admin_menu_items_id_route_ts_id_route_patch",
+      "apps_api_src_app_api_admin_menu_items_id_route_ts_id_route_updateschema",
+      "apps_api_src_app_api_admin_menu_items_id_route_ts_id_route_verifyadmin",
+      "id_route_validatecategoryandkitchen"
+    ],
+    "32": [
+      "apps_api_src_app_api_admin_menu_items_route_ts",
+      "menu_items_route_createschema",
+      "menu_items_route_get",
+      "menu_items_route_post",
+      "menu_items_route_validatecategoryandkitchen",
+      "menu_items_route_verifyadmin"
+    ],
+    "33": [
       "app_layout_metadata",
       "app_layout_viewport",
       "app_providers_providers",
       "apps_customer_pwa_src_app_layout_tsx",
       "apps_customer_pwa_src_app_layout_tsx_app_layout_rootlayout"
     ],
-    "23": [
+    "34": [
+      "apps_staff_app_app_admin_tables_id_qr_tsx",
+      "id_qr_fetchqr",
+      "id_qr_qrdata",
+      "id_qr_qrscreen",
+      "id_qr_styles"
+    ],
+    "35": [
+      "apps_api_src_app_api_admin_categories_id_route_ts",
+      "apps_api_src_app_api_admin_categories_id_route_ts_id_route_delete",
+      "apps_api_src_app_api_admin_categories_id_route_ts_id_route_patch",
+      "apps_api_src_app_api_admin_categories_id_route_ts_id_route_updateschema",
+      "apps_api_src_app_api_admin_categories_id_route_ts_id_route_verifyadmin"
+    ],
+    "36": [
+      "apps_api_src_app_api_admin_kitchens_id_route_ts",
+      "apps_api_src_app_api_admin_kitchens_id_route_ts_id_route_delete",
+      "apps_api_src_app_api_admin_kitchens_id_route_ts_id_route_patch",
+      "apps_api_src_app_api_admin_kitchens_id_route_ts_id_route_updateschema",
+      "apps_api_src_app_api_admin_kitchens_id_route_ts_id_route_verifyadmin"
+    ],
+    "37": [
+      "apps_api_src_app_api_admin_staff_id_route_ts",
+      "apps_api_src_app_api_admin_staff_id_route_ts_id_route_delete",
+      "apps_api_src_app_api_admin_staff_id_route_ts_id_route_patch",
+      "apps_api_src_app_api_admin_staff_id_route_ts_id_route_updateschema",
+      "apps_api_src_app_api_admin_staff_id_route_ts_id_route_verifyadmin"
+    ],
+    "38": [
+      "apps_api_src_app_api_admin_tables_id_route_ts",
+      "apps_api_src_app_api_admin_tables_id_route_ts_id_route_delete",
+      "apps_api_src_app_api_admin_tables_id_route_ts_id_route_patch",
+      "apps_api_src_app_api_admin_tables_id_route_ts_id_route_updateschema",
+      "apps_api_src_app_api_admin_tables_id_route_ts_id_route_verifyadmin"
+    ],
+    "39": [
+      "apps_api_src_app_api_admin_tables_route_ts",
+      "tables_route_createschema",
+      "tables_route_get",
+      "tables_route_post",
+      "tables_route_verifyadmin"
+    ],
+    "40": [
+      "apps_api_src_app_api_admin_categories_route_ts",
+      "categories_route_createschema",
+      "categories_route_get",
+      "categories_route_post",
+      "categories_route_verifyadmin"
+    ],
+    "41": [
+      "apps_api_src_app_api_admin_kitchens_route_ts",
+      "kitchens_route_createschema",
+      "kitchens_route_get",
+      "kitchens_route_post",
+      "kitchens_route_verifyadmin"
+    ],
+    "42": [
+      "apps_api_src_app_api_admin_staff_route_ts",
+      "staff_route_createschema",
+      "staff_route_get",
+      "staff_route_post",
+      "staff_route_verifyadmin"
+    ],
+    "43": [
+      "apps_api_src_app_api_admin_upload_url_route_ts",
+      "upload_url_route_post",
+      "upload_url_route_sanitizefilename",
+      "upload_url_route_schema",
+      "upload_url_route_verifyadmin"
+    ],
+    "44": [
+      "apps_customer_pwa_scripts_generate_icons_js",
+      "scripts_generate_icons_generateicon",
+      "scripts_generate_icons_main",
+      "scripts_generate_icons_path",
+      "scripts_generate_icons_sharp"
+    ],
+    "45": [
+      "apps_api_src_app_api_admin_restaurant_workflow_mode_route_ts",
+      "workflow_mode_route_patch",
+      "workflow_mode_route_updateschema",
+      "workflow_mode_route_verifyadmin"
+    ],
+    "46": [
+      "app_index_index",
+      "apps_staff_app_app_index_tsx",
+      "store_auth_useauthstore"
+    ],
+    "47": [
+      "app_page_homecontent",
+      "app_page_homepage",
+      "apps_customer_pwa_src_app_page_tsx"
+    ],
+    "48": [
       "packages_db_prisma_seed_ts",
       "prisma_seed_main",
       "prisma_seed_prisma"
     ],
-    "24": [
+    "49": [
+      "admin_layout_adminlayout",
+      "apps_staff_app_app_admin_layout_tsx"
+    ],
+    "50": [
+      "api_eslintrc_extends",
+      "apps_api_eslintrc_json"
+    ],
+    "51": [
       "apps_api_src_app_layout_tsx",
       "apps_api_src_app_layout_tsx_app_layout_rootlayout"
     ],
-    "25": [
+    "52": [
+      "apps_api_next_config_mjs",
+      "apps_customer_pwa_next_config_mjs"
+    ],
+    "53": [
       "apps_customer_pwa_src_app_scan_token_page_tsx",
       "token_page_scanpage"
     ],
-    "26": [
-      "apps_staff_app_app_layout_tsx",
-      "apps_staff_app_app_layout_tsx_app_layout_rootlayout"
-    ],
-    "27": [
-      "apps_customer_pwa_next_config_mjs",
-      "customer_pwa_next_config_nextconfig"
-    ],
-    "28": [
+    "54": [
       "apps_customer_pwa_tailwind_config_ts",
       "customer_pwa_tailwind_config_config"
     ],
-    "29": [
+    "55": [
+      "apps_staff_app_app_layout_tsx",
+      "apps_staff_app_app_layout_tsx_app_layout_rootlayout"
+    ],
+    "56": [
+      "apps_customer_pwa_eslintrc_json",
+      "customer_pwa_eslintrc_extends"
+    ],
+    "57": [
       "plan_order",
       "plan_order_item"
     ],
-    "30": [
+    "58": [
       "apps_api_next_env_d_ts"
     ],
-    "31": [
-      "apps_api_next_config_mjs"
-    ],
-    "32": [
+    "59": [
       "apps_customer_pwa_next_env_d_ts"
     ],
-    "33": [
+    "60": [
       "apps_customer_pwa_postcss_config_js"
     ],
-    "34": [
+    "61": [
       "apps_staff_app_babel_config_js"
     ],
-    "35": [
+    "62": [
       "plan_kitchen"
     ],
-    "36": [
+    "63": [
       "phase7_self_collection"
     ],
-    "37": [
+    "64": [
       "phase9_testing"
+    ],
+    "65": [
+      "pnpm_workspace_yaml"
+    ],
+    "66": [
+      "readme_md"
     ]
   },
   "cohesion": {
-    "0": 0.08658536585365853,
-    "1": 0.05714285714285714,
-    "2": 0.08912655971479501,
+    "0": 0.06334841628959276,
+    "1": 0.05128205128205128,
+    "2": 0.05263157894736842,
     "3": 0.06451612903225806,
-    "4": 0.07142857142857142,
+    "4": 0.11182795698924732,
     "5": 0.07692307692307693,
-    "6": 0.08695652173913043,
-    "7": 0.10526315789473684,
-    "8": 0.10526315789473684,
-    "9": 0.10526315789473684,
+    "6": 0.09538461538461539,
+    "7": 0.08333333333333333,
+    "8": 0.10276679841897234,
+    "9": 0.09090909090909091,
     "10": 0.10526315789473684,
-    "11": 0.1111111111111111,
-    "12": 0.13970588235294118,
-    "13": 0.20952380952380953,
-    "14": 0.18681318681318682,
-    "15": 0.21212121212121213,
-    "16": 0.2,
+    "11": 0.10526315789473684,
+    "12": 0.10526315789473684,
+    "13": 0.10526315789473684,
+    "14": 0.10526315789473684,
+    "15": 0.18681318681318682,
+    "16": 0.3111111111111111,
     "17": 0.2,
-    "18": 0.2222222222222222,
+    "18": 0.2,
     "19": 0.2222222222222222,
-    "20": 0.2857142857142857,
-    "21": 0.2857142857142857,
-    "22": 0.4,
-    "23": 0.6666666666666666,
-    "24": 1.0,
-    "25": 1.0,
-    "26": 1.0,
-    "27": 1.0,
-    "28": 1.0,
-    "29": 1.0,
-    "30": 1.0,
-    "31": 1.0,
-    "32": 1.0,
-    "33": 1.0,
-    "34": 1.0,
-    "35": 1.0,
-    "36": 1.0,
-    "37": 1.0
+    "20": 0.2222222222222222,
+    "21": 0.2222222222222222,
+    "22": 0.25,
+    "23": 0.25,
+    "24": 0.2857142857142857,
+    "25": 0.2857142857142857,
+    "26": 0.3333333333333333,
+    "27": 0.2857142857142857,
+    "28": 0.2857142857142857,
+    "29": 0.3333333333333333,
+    "30": 0.3333333333333333,
+    "31": 0.5333333333333333,
+    "32": 0.5333333333333333,
+    "33": 0.4,
+    "34": 0.4,
+    "35": 0.6,
+    "36": 0.6,
+    "37": 0.6,
+    "38": 0.6,
+    "39": 0.6,
+    "40": 0.6,
+    "41": 0.6,
+    "42": 0.6,
+    "43": 0.6,
+    "44": 0.6,
+    "45": 0.6666666666666666,
+    "46": 1.0,
+    "47": 0.6666666666666666,
+    "48": 0.6666666666666666,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0
   },
   "gods": [
+    {
+      "id": "lib_auth_verifystafftoken",
+      "label": "verifyStaffToken()",
+      "degree": 35
+    },
+    {
+      "id": "store_auth_useauthstore",
+      "label": "useAuthStore",
+      "degree": 18
+    },
+    {
+      "id": "socket_events_ts",
+      "label": "Socket Events Types",
+      "degree": 18
+    },
     {
       "id": "restaurant_tsconfig_base_compileroptions",
       "label": "compilerOptions",
@@ -595,29 +900,14 @@
       "degree": 11
     },
     {
+      "id": "lib_realtime_emitevent",
+      "label": "emitEvent()",
+      "degree": 11
+    },
+    {
       "id": "src_enums_orderitemstatus",
       "label": "OrderItemStatus",
       "degree": 10
-    },
-    {
-      "id": "src_enums_staffrole",
-      "label": "StaffRole",
-      "degree": 8
-    },
-    {
-      "id": "src_enums_orderstatus",
-      "label": "OrderStatus",
-      "degree": 8
-    },
-    {
-      "id": "restaurant_turbo_tasks",
-      "label": "tasks",
-      "degree": 7
-    },
-    {
-      "id": "staff_app_package_scripts",
-      "label": "scripts",
-      "degree": 7
     }
   ],
   "surprises": [
@@ -655,17 +945,6 @@
       "why": "crosses file types (code \u2194 doc); connects across different repos/directories; peripheral node `AdminSetWorkflowModeRequest` unexpectedly reaches hub `Workflow Mode`"
     },
     {
-      "source": "StaffTokenPayload",
-      "target": "StaffRole",
-      "source_files": [
-        "apps/api/src/lib/auth.ts",
-        "packages/shared-types/src/enums.ts"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "references",
-      "why": "connects across different repos/directories; bridges separate communities; peripheral node `StaffTokenPayload` unexpectedly reaches hub `StaffRole`"
-    },
-    {
       "source": "Table Session",
       "target": "SessionStatus",
       "source_files": [
@@ -675,10 +954,21 @@
       "confidence": "EXTRACTED",
       "relation": "references",
       "why": "crosses file types (code \u2194 doc); connects across different repos/directories"
+    },
+    {
+      "source": "StaffTokenPayload",
+      "target": "StaffRole",
+      "source_files": [
+        "apps/api/src/lib/auth.ts",
+        "packages/shared-types/src/enums.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; peripheral node `StaffTokenPayload` unexpectedly reaches hub `StaffRole`"
     }
   ],
   "tokens": {
-    "input": 26416,
-    "output": 2210
+    "input": 20088,
+    "output": 1785
   }
 }
