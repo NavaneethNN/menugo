@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
         }),
       },
     },
-    include: { items: { include: { menuItem: true } } },
+    include: { items: { include: { menuItem: true, kitchen: true } } },
   });
 
   // Emit events based on workflow mode
@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
             name: item.menuItem.name,
             qty: item.quantity,
             specialInstructions: item.specialInstructions,
-            kitchenName: `Kitchen ${kitchenId}`, // TODO: Get actual kitchen name
+            kitchenName: item.kitchen.name,
           })),
         }
       );
