@@ -12,23 +12,38 @@ import type { OrderItemStatus } from '@restaurant/shared-types';
 const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001';
 const SOCKET_URL = process.env.EXPO_PUBLIC_SOCKET_URL ?? 'http://localhost:4000';
 
-const NEXT_STATUS: Partial<Record<OrderItemStatus, OrderItemStatus>> = {
+const BASE_NEXT_STATUS: Partial<Record<OrderItemStatus, OrderItemStatus>> = {
   PENDING: 'ACCEPTED',
   ACCEPTED: 'PREPARING',
   PREPARING: 'READY',
 };
 
-const ACTION_LABEL: Partial<Record<OrderItemStatus, string>> = {
+const BASE_ACTION_LABEL: Partial<Record<OrderItemStatus, string>> = {
   PENDING: 'Accept',
   ACCEPTED: 'Start Preparing',
   PREPARING: 'Mark Ready',
 };
 
-const ACTION_COLOR: Partial<Record<OrderItemStatus, string>> = {
+const BASE_ACTION_COLOR: Partial<Record<OrderItemStatus, string>> = {
   PENDING: '#f97316',
   ACCEPTED: '#3b82f6',
   PREPARING: '#22c55e',
 };
+
+function getNextStatus(status: OrderItemStatus, workflowMode: string): OrderItemStatus | undefined {
+  if (status === 'READY' && workflowMode === 'SELF_COLLECTION') return 'SERVED';
+  return BASE_NEXT_STATUS[status];
+}
+
+function getActionLabel(status: OrderItemStatus, workflowMode: string): string | undefined {
+  if (status === 'READY' && workflowMode === 'SELF_COLLECTION') return 'Hand Off';
+  return BASE_ACTION_LABEL[status];
+}
+
+function getActionColor(status: OrderItemStatus, workflowMode: string): string {
+  if (status === 'READY' && workflowMode === 'SELF_COLLECTION') return '#8b5cf6';
+  return BASE_ACTION_COLOR[status] ?? '#f97316';
+}
 
 export default function KitchenScreen() {
   const { token, kitchenId, restaurantId } = useAuthStore();
@@ -104,10 +119,13 @@ export default function KitchenScreen() {
           </View>
         }
         renderItem={({ item }) => {
-          const nextStatus = NEXT_STATUS[item.status as OrderItemStatus];
+          const wfMode = item.order?.workflowMode ?? '';
+          const statusKey = item.status as OrderItemStatus;
+          const nextStatus = getNextStatus(statusKey, wfMode);
           const isReady = item.status === 'READY';
+          const isHandedOff = isReady && wfMode === 'SELF_COLLECTION';
           return (
-            <View style={[styles.card, isReady && styles.cardReady]}>
+            <View style={[styles.card, isReady && !isHandedOff && styles.cardReady]}>
               <View style={styles.cardTop}>
                 <Text style={styles.itemName}>{item.menuItem?.name ?? 'Item'}</Text>
                 <Text style={styles.tableLabel}>
@@ -118,6 +136,9 @@ export default function KitchenScreen() {
               {item.specialInstructions ? (
                 <Text style={styles.note}>"{item.specialInstructions}"</Text>
               ) : null}
+              {wfMode === 'SELF_COLLECTION' && (
+                <Text style={styles.modeBadge}>Self Collection</Text>
+              )}
               <Text style={[
                 styles.statusBadge,
                 styles[`status_${item.status}` as keyof typeof styles] as any,
@@ -126,11 +147,11 @@ export default function KitchenScreen() {
               </Text>
               {nextStatus ? (
                 <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: ACTION_COLOR[item.status as OrderItemStatus] ?? '#f97316' }]}
+                  style={[styles.actionBtn, { backgroundColor: getActionColor(statusKey, wfMode) }]}
                   onPress={() => statusMutation.mutate({ id: item.id, status: nextStatus })}
                   disabled={statusMutation.isPending}
                 >
-                  <Text style={styles.actionBtnText}>{ACTION_LABEL[item.status as OrderItemStatus]}</Text>
+                  <Text style={styles.actionBtnText}>{getActionLabel(statusKey, wfMode)}</Text>
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -163,6 +184,11 @@ const styles = StyleSheet.create({
   status_ACCEPTED: { backgroundColor: '#dbeafe', color: '#1e40af' },
   status_PREPARING: { backgroundColor: '#fed7aa', color: '#c2410c' },
   status_READY: { backgroundColor: '#dcfce7', color: '#166534' },
+  modeBadge: {
+    alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2,
+    borderRadius: 999, fontSize: 11, fontWeight: '600', marginBottom: 6,
+    backgroundColor: '#ede9fe', color: '#6d28d9',
+  },
   actionBtn: { borderRadius: 12, paddingVertical: 10, alignItems: 'center' },
   actionBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   empty: { alignItems: 'center', paddingTop: 60 },

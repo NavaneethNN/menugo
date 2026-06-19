@@ -50,6 +50,7 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
   const [sessionEnded, setSessionEnded] = useState(false);
   const [readyItems, setReadyItems] = useState<Map<string, string>>(new Map());
   const [allItemsReady, setAllItemsReady] = useState(false);
+  const [collectingItems, setCollectingItems] = useState<Set<string>>(new Set());
 
   const { data: order, isLoading } = useQuery<Order>({
     queryKey: ['order', params.orderId],
@@ -161,6 +162,21 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
 
   const allServed = order.items.every((i) => i.status === 'SERVED');
   const allReady = order.items.every((i) => i.status === 'READY' || i.status === 'SERVED');
+
+  async function markCollected(orderItemId: string) {
+    const sessionToken = sessionStorage.getItem('sessionToken');
+    if (!sessionToken) return;
+    setCollectingItems((prev) => new Set(prev).add(orderItemId));
+    try {
+      await fetch(`${API_BASE}/api/order-items/${orderItemId}/collected`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionToken }),
+      });
+    } finally {
+      setCollectingItems((prev) => { const next = new Set(prev); next.delete(orderItemId); return next; });
+    }
+  }
   const anyReady = order.items.some((i) => i.status === 'READY');
   const workflowMode = order.workflowMode;
 
@@ -299,26 +315,39 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
       <div className="mx-4 mt-4 space-y-3">
         {order.items.map((item) => {
           const statusKey = item.status as OrderItemStatus;
+          const canCollect = workflowMode === 'SELF_COLLECTION' && item.status === 'READY';
+          const isCollecting = collectingItems.has(item.id);
           return (
             <div
               key={item.id}
-              className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm border border-gray-100"
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
             >
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900">{item.menuItemName}</p>
-                <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity}</p>
-                {item.specialInstructions && (
-                  <p className="text-xs text-gray-400 mt-0.5 italic">
-                    "{item.specialInstructions}"
-                  </p>
-                )}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900">{item.menuItemName}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity}</p>
+                  {item.specialInstructions && (
+                    <p className="text-xs text-gray-400 mt-0.5 italic">
+                      "{item.specialInstructions}"
+                    </p>
+                  )}
+                </div>
+                <div
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shrink-0 ${STATUS_COLOR[statusKey]}`}
+                >
+                  {STATUS_ICONS[statusKey]}
+                  {STATUS_LABELS[statusKey]}
+                </div>
               </div>
-              <div
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${STATUS_COLOR[statusKey]}`}
-              >
-                {STATUS_ICONS[statusKey]}
-                {STATUS_LABELS[statusKey]}
-              </div>
+              {canCollect && (
+                <button
+                  onClick={() => markCollected(item.id)}
+                  disabled={isCollecting}
+                  className="mt-3 w-full py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold disabled:opacity-50 transition-opacity"
+                >
+                  {isCollecting ? 'Marking...' : "I've collected this"}
+                </button>
+              )}
             </div>
           );
         })}
