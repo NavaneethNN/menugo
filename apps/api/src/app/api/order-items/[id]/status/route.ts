@@ -10,7 +10,7 @@ const schema = z.object({
   status: z.enum(['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED']),
 });
 
-const VALID_TRANSITIONS: Partial<Record<OrderItemStatus, OrderItemStatus>> = {
+const BASE_TRANSITIONS: Partial<Record<OrderItemStatus, OrderItemStatus>> = {
   PENDING: 'ACCEPTED',
   ACCEPTED: 'PREPARING',
   PREPARING: 'READY',
@@ -39,7 +39,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   const { status } = parse.data;
 
-  const existing = await prisma.orderItem.findUnique({ where: { id: params.id } });
+  const existing = await prisma.orderItem.findUnique({
+    where: { id: params.id },
+    include: { order: { select: { workflowMode: true } } },
+  });
   if (!existing) {
     return NextResponse.json({ error: 'Order item not found' }, { status: 404 });
   }
@@ -48,7 +51,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: 'Forbidden: item belongs to a different kitchen' }, { status: 403 });
   }
 
-  const expectedNext = VALID_TRANSITIONS[existing.status as OrderItemStatus];
+  const isSelfCollection = existing.order.workflowMode === 'SELF_COLLECTION';
+  const validTransitions: Partial<Record<OrderItemStatus, OrderItemStatus>> = {
+    ...BASE_TRANSITIONS,
+    ...(isSelfCollection ? { READY: 'SERVED' } : {}),
+  };
+
+  const expectedNext = validTransitions[existing.status as OrderItemStatus];
   if (status !== expectedNext) {
     return NextResponse.json(
       { error: `Invalid transition: ${existing.status} → ${status}. Expected: ${existing.status} → ${expectedNext ?? '(none)'}` },
@@ -77,6 +86,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         } 
       },
       menuItem: true,
+      kitchen: true,
     },
   });
 
@@ -102,6 +112,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       status: status,
     }
   );
+
+  // Emit order:completed to customer session room when all items served (Self Collection)
+  if (status === 'SERVED' && newOrderStatus === 'COMPLETED') {
+    try {
+      await emitEvent(`session:${sessionId}`, 'order:completed', { orderId: item.orderId });
+    } catch {}
+  }
 
   // Handle workflow-specific events when item becomes READY
   if (status === 'READY') {
@@ -155,7 +172,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         {
           orderItemId: item.id,
           name: item.menuItem.name,
-          kitchenName: `Kitchen ${item.kitchenId}`, // TODO: Get actual kitchen name
+          kitchenName: item.kitchen.name,
         }
       );
 

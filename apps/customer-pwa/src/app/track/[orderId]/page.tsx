@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { io } from 'socket.io-client';
-import { CheckCircle, Clock, ChefHat, PackageCheck, WifiOff } from 'lucide-react';
+import { CheckCircle, Clock, ChefHat, PackageCheck, WifiOff, MapPin } from 'lucide-react';
 import type { Order, OrderItemStatus } from '@restaurant/shared-types';
 import type { 
   OrderItemStatusUpdateEvent,
@@ -48,6 +48,9 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
   const socketRef = useRef<ReturnType<typeof io> | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
+  const [readyItems, setReadyItems] = useState<Map<string, string>>(new Map());
+  const [allItemsReady, setAllItemsReady] = useState(false);
+  const [collectingItems, setCollectingItems] = useState<Set<string>>(new Set());
 
   const { data: order, isLoading } = useQuery<Order>({
     queryKey: ['order', params.orderId],
@@ -105,15 +108,8 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
       });
     });
 
-    socket.on('order:fully_ready', (data: OrderFullyReadyEvent) => {
-      queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
-        if (!old) return old;
-        return { ...old, status: 'FULLY_READY' };
-      });
-    });
-
     socket.on('order:item_ready_for_pickup', (data: OrderItemReadyForPickupEvent) => {
-      // Update the specific item status in cache
+      setReadyItems((prev) => new Map(prev).set(data.orderItemId, data.kitchenName));
       queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
         if (!old) return old;
         return {
@@ -125,7 +121,17 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
       });
     });
 
+    socket.on('order:fully_ready', (data: OrderFullyReadyEvent) => {
+      setAllItemsReady(true);
+      queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
+        if (!old) return old;
+        return { ...old, status: 'FULLY_READY' };
+      });
+    });
+
     socket.on('order:completed', (data: OrderCompletedEvent) => {
+      setReadyItems(new Map());
+      setAllItemsReady(false);
       queryClient.setQueryData<Order>(['order', params.orderId], (old) => {
         if (!old) return old;
         return {
@@ -156,8 +162,32 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
 
   const allServed = order.items.every((i) => i.status === 'SERVED');
   const allReady = order.items.every((i) => i.status === 'READY' || i.status === 'SERVED');
+
+  async function markCollected(orderItemId: string) {
+    const sessionToken = sessionStorage.getItem('sessionToken');
+    if (!sessionToken) return;
+    setCollectingItems((prev) => new Set(prev).add(orderItemId));
+    try {
+      await fetch(`${API_BASE}/api/order-items/${orderItemId}/collected`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionToken }),
+      });
+    } finally {
+      setCollectingItems((prev) => { const next = new Set(prev); next.delete(orderItemId); return next; });
+    }
+  }
   const anyReady = order.items.some((i) => i.status === 'READY');
   const workflowMode = order.workflowMode;
+
+  const kitchenGroups = order.items.reduce<Map<string, { kitchenName: string; items: typeof order.items }>>(
+    (acc, item) => {
+      if (!acc.has(item.kitchenName)) acc.set(item.kitchenName, { kitchenName: item.kitchenName, items: [] });
+      acc.get(item.kitchenName)!.items.push(item);
+      return acc;
+    },
+    new Map()
+  );
 
   return (
     <div className="min-h-screen pb-24 bg-gray-50">
@@ -189,20 +219,47 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
             </div>
           </div>
         )}
-        {!allServed && anyReady && workflowMode === 'SELF_COLLECTION' && (
-          <div className="rounded-2xl bg-brand-50 border border-brand-200 p-4 flex items-center gap-3 animate-pulse">
-            <PackageCheck className="w-6 h-6 text-brand-600 shrink-0" />
-            <div>
-              <p className="font-bold text-brand-800">Ready for Pickup</p>
-              <p className="text-sm text-brand-600">
-                {order.items
-                  .filter((i) => i.status === 'READY')
-                  .map((i) => i.kitchenName)
-                  .filter((v, i, a) => a.indexOf(v) === i)
-                  .join(', ')}
-              </p>
-            </div>
-          </div>
+        {workflowMode === 'SELF_COLLECTION' && !allServed && (
+          <>
+            {allItemsReady ? (
+              <div className="rounded-2xl bg-green-50 border border-green-200 p-4 flex items-center gap-3 animate-pulse">
+                <PackageCheck className="w-6 h-6 text-green-600 shrink-0" />
+                <div>
+                  <p className="font-bold text-green-800">All items ready — collect from the counters!</p>
+                  <p className="text-sm text-green-600">Head to each kitchen to pick up your order.</p>
+                </div>
+              </div>
+            ) : readyItems.size > 0 ? (
+              <div className="space-y-2">
+                {Array.from(
+                  new Map(
+                    [...readyItems.entries()].reduce<Map<string, string[]>>((acc, [itemId, kitchen]) => {
+                      if (!acc.has(kitchen)) acc.set(kitchen, []);
+                      acc.get(kitchen)!.push(itemId);
+                      return acc;
+                    }, new Map())
+                  )
+                ).map(([kitchen]) => (
+                  <div
+                    key={kitchen}
+                    className="rounded-2xl bg-brand-50 border border-brand-200 p-4 flex items-center gap-3 animate-pulse"
+                  >
+                    <PackageCheck className="w-6 h-6 text-brand-600 shrink-0" />
+                    <div>
+                      <p className="font-bold text-brand-800">Ready at {kitchen}!</p>
+                      <p className="text-sm text-brand-600">
+                        {order.items
+                          .filter((i) => readyItems.get(i.id) === kitchen)
+                          .map((i) => `${i.quantity}× ${i.menuItemName}`)
+                          .join(', ')}
+                      </p>
+                      <p className="text-xs text-brand-500 mt-0.5">Please collect from the counter.</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </>
         )}
         {!allServed && !allReady && anyReady && workflowMode === 'MANAGED_DINING' && (
           <div className="rounded-2xl bg-yellow-50 border border-yellow-200 p-4 flex items-center gap-3">
@@ -217,30 +274,80 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
         )}
       </div>
 
+      {/* Kitchen Map — Self Collection only */}
+      {workflowMode === 'SELF_COLLECTION' && !allServed && (
+        <div className="mx-4 mt-4">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Where to collect</p>
+          <div className="space-y-2">
+            {Array.from(kitchenGroups.values()).map(({ kitchenName, items: kItems }) => {
+              const hasReady = kItems.some((i) => i.status === 'READY');
+              return (
+                <div
+                  key={kitchenName}
+                  className={`rounded-2xl p-3 flex items-start gap-3 border ${
+                    hasReady
+                      ? 'bg-brand-50 border-brand-200'
+                      : 'bg-white border-gray-100'
+                  }`}
+                >
+                  <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${hasReady ? 'text-brand-600' : 'text-gray-400'}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-semibold ${hasReady ? 'text-brand-800' : 'text-gray-700'}`}>
+                      {kitchenName}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {kItems.map((i) => `${i.quantity}× ${i.menuItemName}`).join(', ')}
+                    </p>
+                  </div>
+                  {hasReady && (
+                    <span className="text-xs font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full shrink-0">
+                      Ready
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Items */}
       <div className="mx-4 mt-4 space-y-3">
         {order.items.map((item) => {
           const statusKey = item.status as OrderItemStatus;
+          const canCollect = workflowMode === 'SELF_COLLECTION' && item.status === 'READY';
+          const isCollecting = collectingItems.has(item.id);
           return (
             <div
               key={item.id}
-              className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm border border-gray-100"
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
             >
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900">{item.menuItemName}</p>
-                <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity}</p>
-                {item.specialInstructions && (
-                  <p className="text-xs text-gray-400 mt-0.5 italic">
-                    "{item.specialInstructions}"
-                  </p>
-                )}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900">{item.menuItemName}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity}</p>
+                  {item.specialInstructions && (
+                    <p className="text-xs text-gray-400 mt-0.5 italic">
+                      "{item.specialInstructions}"
+                    </p>
+                  )}
+                </div>
+                <div
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shrink-0 ${STATUS_COLOR[statusKey]}`}
+                >
+                  {STATUS_ICONS[statusKey]}
+                  {STATUS_LABELS[statusKey]}
+                </div>
               </div>
-              <div
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${STATUS_COLOR[statusKey]}`}
-              >
-                {STATUS_ICONS[statusKey]}
-                {STATUS_LABELS[statusKey]}
-              </div>
+              {canCollect && (
+                <button
+                  onClick={() => markCollected(item.id)}
+                  disabled={isCollecting}
+                  className="mt-3 w-full py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold disabled:opacity-50 transition-opacity"
+                >
+                  {isCollecting ? 'Marking...' : "I've collected this"}
+                </button>
+              )}
             </div>
           );
         })}

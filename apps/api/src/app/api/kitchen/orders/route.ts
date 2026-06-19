@@ -25,7 +25,10 @@ export async function GET(req: NextRequest) {
     include: {
       menuItem: { select: { name: true, imageUrl: true } },
       order: {
-        include: { tableSession: { include: { table: { select: { tableNumber: true } } } } },
+        select: {
+          workflowMode: true,
+          tableSession: { include: { table: { select: { tableNumber: true } } } },
+        },
       },
     },
     orderBy: { order: { createdAt: 'asc' } },
