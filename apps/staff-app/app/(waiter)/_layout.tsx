@@ -18,14 +18,24 @@ export default function WaiterLayout() {
         headerStyle: { backgroundColor: '#2563eb' },
         headerTintColor: '#fff',
         headerTitleStyle: { fontWeight: '700' },
-        headerTitle: name ?? 'Waiter',
-        headerRight: () => (
-          <TouchableOpacity onPress={handleLogout} style={{ marginRight: 4, padding: 4 }}>
-            <LogOut size={20} color="#fff" />
-          </TouchableOpacity>
-        ),
         headerShown: true,
       }}
-    />
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          headerTitle: name ?? 'Waiter',
+          headerRight: () => (
+            <TouchableOpacity onPress={handleLogout} style={{ marginRight: 4, padding: 4 }}>
+              <LogOut size={20} color="#fff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="order/[id]"
+        options={{ headerTitle: 'Order Detail', headerBackTitle: 'Back' }}
+      />
+    </Stack>
   );
 }

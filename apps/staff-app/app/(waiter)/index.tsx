@@ -6,6 +6,7 @@ import {
 import { CheckCircle } from 'lucide-react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { io } from 'socket.io-client';
+import { router } from 'expo-router';
 
 import { useAuthStore } from '@/store/auth';
 import { playNewOrderAlert, playReadyToServeAlert } from '@/lib/sound';
@@ -85,6 +86,7 @@ function OrderCard({
   acknowledged: boolean;
 }) {
   const tableNumber = order.tableSession.table.tableNumber;
+  const handleCardPress = () => router.push(`/(waiter)/order/${order.id}`);
   const shortId = order.id.slice(-4).toUpperCase();
   const isFullyReady = order.status === 'FULLY_READY';
   const isPartiallyReady = order.status === 'PARTIALLY_READY';
@@ -95,7 +97,11 @@ function OrderCard({
     .map((i) => i.id);
 
   return (
-    <View style={[styles.card, isFullyReady && styles.cardFullyReady]}>
+    <TouchableOpacity
+      style={[styles.card, isFullyReady && styles.cardFullyReady]}
+      onPress={handleCardPress}
+      activeOpacity={0.85}
+    >
       <View style={styles.cardHeader}>
         <Text style={styles.tableNumber}>Table {tableNumber}</Text>
         <View style={styles.cardMeta}>
@@ -155,7 +161,7 @@ function OrderCard({
           <Text style={styles.acknowledgedText}>Acknowledged</Text>
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 }
 

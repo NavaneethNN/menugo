@@ -6,7 +6,7 @@ let readyToServePlayer: AudioPlayer | null = null;
 export async function initSound(): Promise<void> {
   try {
     newOrderPlayer = createAudioPlayer(require('../../assets/sounds/new-order.mp3'));
-    readyToServePlayer = createAudioPlayer(require('../../assets/sounds/new-order.mp3'));
+    readyToServePlayer = createAudioPlayer(require('../../assets/sounds/ready-to-serve.mp3'));
   } catch (error) {
     console.error('[sound] Failed to init sound players:', error);
   }
