@@ -1,5 +1,6 @@
 import { PrismaClient, WorkflowMode, StaffRole } from '@prisma/client';
 import { randomUUID } from 'crypto';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -196,11 +197,13 @@ async function main() {
   ];
 
   for (const staff of staffMembers) {
+    const hashedPin = await bcrypt.hash(staff.pin, 10);
     await prisma.staff.upsert({
       where: { id: staff.id },
       update: {},
       create: {
         ...staff,
+        pin: hashedPin,
         restaurantId: restaurant.id,
       },
     });
