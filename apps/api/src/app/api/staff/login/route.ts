@@ -18,29 +18,37 @@ export async function POST(req: NextRequest) {
 
   const { restaurantId, pin } = parse.data;
 
-  const staff = await prisma.staff.findFirst({
+  const staffList = await prisma.staff.findMany({
     where: { restaurantId, isActive: true },
   });
 
-  if (!staff || !(await bcrypt.compare(pin, staff.pin))) {
+  let matchedStaff = null;
+  for (const staff of staffList) {
+    if (await bcrypt.compare(pin, staff.pin)) {
+      matchedStaff = staff;
+      break;
+    }
+  }
+
+  if (!matchedStaff) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   const token = await signStaffToken({
-    staffId: staff.id,
-    restaurantId: staff.restaurantId,
-    role: staff.role,
-    kitchenId: staff.kitchenId ?? undefined,
+    staffId: matchedStaff.id,
+    restaurantId: matchedStaff.restaurantId,
+    role: matchedStaff.role,
+    kitchenId: matchedStaff.kitchenId ?? undefined,
   });
 
   return NextResponse.json({
     token,
     staff: {
-      id: staff.id,
-      name: staff.name,
-      role: staff.role,
-      kitchenId: staff.kitchenId,
-      restaurantId: staff.restaurantId,
+      id: matchedStaff.id,
+      name: matchedStaff.name,
+      role: matchedStaff.role,
+      kitchenId: matchedStaff.kitchenId,
+      restaurantId: matchedStaff.restaurantId,
     },
   });
 }
