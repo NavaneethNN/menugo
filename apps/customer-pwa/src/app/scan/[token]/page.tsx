@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, ChevronRight, AlertTriangle } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-export default function ScanPage({ params }: { params: { token: string } }) {
+export default function ScanPage({ params }: { params: { token: string } }): JSX.Element {
   const router = useRouter();
   const [seats, setSeats] = useState(1);
   const [loading, setLoading] = useState(false);

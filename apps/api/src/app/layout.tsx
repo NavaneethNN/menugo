@@ -1,4 +1,6 @@
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import type { ReactNode, JSX } from 'react';
+
+export default function RootLayout({ children }: { children: ReactNode }): JSX.Element {
   return (
     <html lang="en">
       <body>{children}</body>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@restaurant/db';
+import type { MenuItem, OrderItem, Kitchen } from '@restaurant/db';
 import { verifySessionToken } from '@/lib/auth';
 import { emitEvent } from '@/lib/realtime';
 import { z } from 'zod';
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
     where: { id: { in: menuItemIds }, restaurantId: session.table.restaurantId },
   });
 
-  const menuItemMap = new Map(menuItems.map((m) => [m.id, m]));
+  const menuItemMap = new Map(menuItems.map((m: MenuItem) => [m.id, m]));
 
   // Validate all menu items exist and are available
   for (const item of items) {
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
       status: 'PLACED',
       workflowMode: session.table.restaurant.workflowMode,
       items: {
-        create: items.map((item) => {
+        create: items.map((item: { menuItemId: string; quantity: number; specialInstructions?: string }) => {
           const mi = menuItemMap.get(item.menuItemId)!;
           return {
             menuItemId: item.menuItemId,
@@ -133,7 +134,7 @@ export async function POST(req: NextRequest) {
         {
           orderId: order.id,
           tableNumber: session.table.tableNumber,
-          items: kitchenItems.map(item => ({
+          items: kitchenItems.map((item: OrderItem & { menuItem: MenuItem; kitchen: Kitchen }) => ({
             orderItemId: item.id,
             name: item.menuItem.name,
             qty: item.quantity,

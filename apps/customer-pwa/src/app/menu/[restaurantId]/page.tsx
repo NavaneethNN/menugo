@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type JSX } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ShoppingCart, Minus, Plus, ChevronRight, Loader2 } from 'lucide-react';
@@ -16,7 +16,7 @@ interface CartItem {
   specialInstructions: string;
 }
 
-export default function MenuPage({ params }: { params: { restaurantId: string } }) {
+export default function MenuPage({ params }: { params: { restaurantId: string } }): JSX.Element {
   const router = useRouter();
   const [cart, setCart] = useState<Record<string, CartItem>>({});
   const [showCart, setShowCart] = useState(false);

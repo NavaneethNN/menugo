@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, type JSX } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 function HomeContent() {
@@ -42,7 +42,7 @@ function HomeContent() {
   );
 }
 
-export default function HomePage() {
+export default function HomePage(): JSX.Element {
   return (
     <Suspense fallback={
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-brand-50 to-white">

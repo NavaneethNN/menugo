@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { io } from 'socket.io-client';
@@ -42,7 +42,7 @@ const STATUS_COLOR: Record<OrderItemStatus, string> = {
   SERVED: 'bg-brand-100 text-brand-700',
 };
 
-export default function TrackPage({ params }: { params: { orderId: string } }) {
+export default function TrackPage({ params }: { params: { orderId: string } }): JSX.Element {
   const router = useRouter();
   const queryClient = useQueryClient();
   const socketRef = useRef<ReturnType<typeof io> | null>(null);
