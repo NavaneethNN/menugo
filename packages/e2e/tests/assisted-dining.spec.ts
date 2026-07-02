@@ -32,7 +32,7 @@ test.describe('Phase 9.2 — Assisted Dining', () => {
 
     const waiter = await loginStaff(TEST_RESTAURANT_ID, '3333');
     const waiterOrders = await getWaiterOrders(waiter.token);
-    const order = waiterOrders.find((o) => o.orderId === orderId);
+    const order = waiterOrders.find((o) => o.id === orderId);
     expect(order).toBeTruthy();
     expect(order!.items.length).toBe(2);
 

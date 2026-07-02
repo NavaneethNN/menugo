@@ -39,7 +39,7 @@ test.describe('Phase 9.3 — Self Collection', () => {
     expect(biriyaniItem!.order.workflowMode).toBe('SELF_COLLECTION');
 
     const waiterOrders = await getWaiterOrders(waiter.token);
-    const waiterOrder = waiterOrders.find((o) => o.orderId === orderId);
+    const waiterOrder = waiterOrders.find((o) => o.id === orderId);
     expect(waiterOrder).toBeUndefined();
   });
 
@@ -162,7 +162,7 @@ test.describe('Phase 9.3 — Self Collection', () => {
     await updateItemStatus(k1.token, biriyaniItem!.id, 'READY');
 
     const waiterOrders = await getWaiterOrders(waiter.token);
-    const waiterOrder = waiterOrders.find((o) => o.orderId === orderAId);
+    const waiterOrder = waiterOrders.find((o) => o.id === orderAId);
     expect(waiterOrder).toBeTruthy();
 
     await setWorkflowMode(WorkflowMode.SELF_COLLECTION);

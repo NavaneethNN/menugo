@@ -87,10 +87,11 @@ export async function getWaiterOrders(token: string) {
   });
   if (!res.ok) throw new Error(`Waiter orders failed: ${res.status}`);
   return (await res.json()) as {
-    orderId: string;
+    id: string;
     tableNumber: string;
     status: string;
-    items: { orderItemId: string; name: string; qty: number }[];
+    workflowMode: string;
+    items: { id: string; menuItemName: string; quantity: number }[];
   }[];
 }
 
