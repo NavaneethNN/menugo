@@ -1,75 +1,204 @@
 # AI Coding Rules - Restaurant Ordering System
 # Read this file before executing any prompt
 
-## 1. Code Search & Analysis
-- **USE GRAPHIFY OUT FOR SEARCHING FILES** - Always check `graphify-out/graph.json` and `.graphify_analysis.json` first when exploring the codebase
-- Prefer `code_search` tool for initial exploration when context is unclear
-- Use `grep_search` for targeted finds after initial exploration
-- Never guess file locations - verify with tools
+## 1. Code Search & Analysis (Highest Priority)
 
-## 2. Code Quality Standards
-- Write production-ready, type-safe TypeScript code
-- Use strict typing - no `any` unless absolutely necessary
-- Follow existing patterns in the codebase (check similar files first)
-- Keep functions small and focused (single responsibility)
-- Use early returns to reduce nesting
-- Prefer explicit over implicit
+### Primary Context
+- ALWAYS use `repomix-output.xml` as the first source to understand the repository.
+- Use `repomix-output.xml` to identify:
+  - project structure
+  - file locations
+  - existing architecture
+  - imports
+  - naming conventions
 
-## 3. Comments & Documentation Policy
-- **NO EXPLANATORY COMMENTS** in code - code should be self-documenting via clear naming
-- **NO JSDoc** unless it's a public API surface
-- **NO INLINE COMMENTS** explaining "what" - only "why" if it's non-obvious business logic
-- Exception: Complex algorithmic logic needs brief "why" comment
-- Keep comments under 1% of code lines
+### Architecture Analysis
+- Use **code-review-graph** whenever understanding relationships is important.
+- Prefer code-review-graph for:
+  - function call chains
+  - dependency analysis
+  - component relationships
+  - service interactions
+  - API flow
+  - database access paths
+  - impact analysis before refactoring
 
-## 4. File Structure & Imports
-- Group imports: external libs → internal packages → relative imports
-- One blank line between import groups
-- Use absolute imports for cross-package references
-- No `index.ts` barrel exports for new modules
+### Search Strategy
+1. Read `repomix-output.xml`
+2. Check code-review-graph if relationships are required
+3. Use `code_search` if additional context is needed
+4. Use `grep_search` only for targeted searches
 
-## 5. Error Handling
-- All async operations must have try/catch
-- Use Zod for all external input validation
-- Never expose internal error details to client (500 responses = generic message)
-- Log errors with context for debugging
+Never guess file locations.
 
-## 6. Database & Prisma
-- Always scope queries to `restaurantId` (no cross-tenant leakage)
-- Use `include` eagerly to avoid N+1 queries
-- No raw SQL unless performance critical
-- Migration required for schema changes
+---
 
-## 7. Real-time Events (Socket.io)
-- All DB state changes must emit corresponding socket events
-- Use `emitEvent()` helper from `lib/realtime.ts`
-- Fail silently on emit errors (don't break API responses)
-- Event names must match `shared-types` exactly
+## 2. Before Writing Code
 
-## 8. Testing Verification
-- Before marking complete, verify with actual test commands
-- Use Playwright for E2E when available
-- Manual verification steps must be copy-pasteable
+Always determine:
+
+- Existing implementation pattern
+- Similar components
+- Dependencies
+- Upstream callers
+- Downstream consumers
+
+Use code-review-graph to verify impact before modifying shared code.
+
+---
+
+## 3. Code Quality Standards
+
+- Production-ready TypeScript
+- Strict typing
+- Never use `any`
+- Follow existing project patterns
+- Small focused functions
+- Prefer composition
+- Early returns
+- Explicit code over clever code
+
+---
+
+## 4. Comments & Documentation
+
+- No explanatory comments
+- No JSDoc except public APIs
+- No inline comments describing what code does
+- Only explain WHY when business logic is non-obvious
+- Keep comments under 1%
+
+---
+
+## 5. File Structure
+
+- External imports
+- Internal imports
+- Relative imports
+
+One blank line between groups.
+
+No new barrel exports.
+
+---
+
+## 6. Error Handling
+
+- Every async operation wrapped in try/catch
+- Validate external input with Zod
+- Never expose internal errors
+- Log errors with context
+
+---
+
+## 7. Database (Prisma)
+
+- Every query scoped to restaurantId
+- Prevent cross-tenant access
+- Use include to avoid N+1
+- No raw SQL unless necessary
+- Schema changes require migrations
+
+---
+
+## 8. Socket Events
+
+- Every DB mutation emits corresponding event
+- Use emitEvent()
+- Ignore socket failures
+- Event names must match shared-types
+
+---
 
 ## 9. Security
-- No credentials in committed files
-- All staff endpoints require JWT + role verification
-- PINs stored as bcrypt hashes only
-- Validate all IDs belong to the same restaurant
 
-## 10. Output Format
-- Show minimal code diffs - context only when needed
-- Use proper file citations with line numbers
-- Never output full files unless requested
-- End with concise summary of changes
+- No secrets in repository
+- JWT + Role verification
+- bcrypt PIN hashes only
+- Validate tenant ownership for every ID
 
-## 11. Git Workflow (Phases)
-- **AFTER EACH SUB-PHASE (2.1, 2.2, etc.):** Auto-commit with descriptive message
-  - Format: `git add -A && git commit -m "phase X.Y: brief description"`
-  - Example: `git commit -m "phase 2.1: add categories CRUD endpoints"`
-  Before starting a new phase ( phase 2, phase 3)  create a new branch and switch to it. 
-- **AFTER EACH FULL PHASE (Phase 2, Phase 3, etc.):**
-  1. Push current branch: `git push origin main`
-  2. Create new branch for next phase: `git checkout -b phase-X`
-  3. Continue work on the new branch
-- Never mix work from different phases on the same branch
+---
+
+## 10. Verification
+
+Before finishing:
+
+- Verify affected call chains using code-review-graph
+- Run tests
+- Provide copy-paste verification commands
+
+---
+
+## 11. Output Format
+
+- Minimal diffs
+- File references
+- No full file dumps
+- Concise summary
+
+---
+
+## 12. Git Workflow
+
+### After every sub-phase
+
+```bash
+git add -A
+git commit -m "phase X.Y: description"
+
+
+
+Before every new phase
+git checkout -b phase-X
+After completing a phase
+git push origin <current-branch>
+
+Never mix work from different phases.
+
+13. Repomix Usage
+
+Whenever repository structure changes:
+
+regenerate repomix-output.xml
+use the updated file before making further changes
+
+Never rely on stale repository snapshots.
+
+14. code-review-graph Usage
+
+Whenever modifying shared code:
+
+inspect callers
+inspect callees
+inspect dependencies
+inspect affected modules
+
+Before large refactors:
+
+identify every impacted component
+verify no circular dependencies
+verify architectural consistency
+
+Always use code-review-graph for impact analysis instead of manual reasoning.
+
+15. Decision Priority
+Existing project architecture
+Repomix repository context
+code-review-graph dependency analysis
+Existing coding patterns
+User request
+
+Never violate higher-priority rules.
+
+
+I would also add one more rule specifically for **Windsurf**:
+
+```md
+## 16. Context Refresh
+
+Before every major task:
+
+1. Refresh repomix-output.xml if the repository changed.
+2. Refresh code-review-graph after structural changes.
+3. Never rely on stale AI context.
+4. Prefer repository artifacts over model memory.

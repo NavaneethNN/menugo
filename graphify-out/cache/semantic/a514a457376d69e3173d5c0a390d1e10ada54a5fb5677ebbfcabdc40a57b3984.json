@@ -1,1 +1,0 @@
-{"nodes": [{"id": "phase3_test_md", "label": "Phase 3 Testing Guide", "file_type": "document", "source_file": "phases/test/phase3_test.md"}], "edges": [{"source": "phase3_test_md", "target": "apps_customer_pwa", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "phases/test/phase3_test.md"}], "hyperedges": []}

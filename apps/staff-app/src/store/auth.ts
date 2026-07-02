@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import type { StaffRole } from '@restaurant/shared-types';
 
+import { saveAuth, clearAuth as clearStoredAuth } from '@/lib/storage';
+
 interface AuthState {
   token: string | null;
   staffId: string | null;
@@ -26,7 +28,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   role: null,
   kitchenId: null,
   restaurantId: null,
-  setAuth: (payload) =>
+  setAuth: (payload) => {
+    saveAuth(payload);
     set({
       token: payload.token,
       staffId: payload.staffId,
@@ -34,8 +37,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       role: payload.role,
       kitchenId: payload.kitchenId,
       restaurantId: payload.restaurantId,
-    }),
-  clearAuth: () =>
+    });
+  },
+  clearAuth: () => {
+    clearStoredAuth();
     set({
       token: null,
       staffId: null,
@@ -43,5 +48,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       role: null,
       kitchenId: null,
       restaurantId: null,
-    }),
+    });
+  },
 }));
